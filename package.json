@@ -1,0 +1,47 @@
+{
+  "name": "screwdriver-template-main",
+  "version": "0.0.1",
+  "description": "Validates and publishes templates",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "jenkins-mocha --recursive",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:screwdriver-cd/template-main.git"
+  },
+  "homepage": "https://github.com/screwdriver-cd/template-main",
+  "bugs": "https://github.com/screwdriver-cd/screwdriver/issues",
+  "keywords": [
+    "screwdriver",
+    "yahoo"
+  ],
+  "license": "BSD-3-Clause",
+  "author": "Tiffany Kyi <tiffanykyi@gmail.com>",
+  "contributors": [
+    "Dao Lam <daolam112@gmail.com>",
+    "Darren Matsumoto <aeneascorrupt@gmail.com>",
+    "Jeremiah Wuenschel <jeremiah.wuenschel@gmail.com>",
+    "Jerry Zhang <thejerryzhang@gmail.com>",
+    "Min Zhang <minzhang@andrew.cmu.edu>",
+    "Peter Peterson <jedipetey@gmail.com>",
+    "Reetika Rastogi <r3rastogi@gmail.com>",
+    "St. John Johnson <st.john.johnson@gmail.com",
+    "Tiffany Kyi <tiffanykyi@gmail.com>"
+  ],
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.9.1",
+    "eslint-config-screwdriver": "^2.0.9",
+    "jenkins-mocha": "^3.0.0"
+  },
+  "dependencies": {},
+  "release": {
+    "debug": false,
+    "verifyConditions": {
+      "path": "./node_modules/semantic-release/src/lib/plugin-noop.js"
+    }
+  }
+}
