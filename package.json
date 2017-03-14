@@ -40,7 +40,6 @@
     "sinon": "1.17.7"
   },
   "dependencies": {
-    "request": "^2.81.0"
   },
   "release": {
     "debug": false,

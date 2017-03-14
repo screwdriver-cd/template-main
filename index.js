@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const request = require('request');
+const https = require('https');
 
 /**
  * Will stringify a sd-template.yaml file
@@ -20,28 +20,24 @@ function stringifyYaml(pathToYaml) {
  *                           Will resolve with a JSON object with the errors and template objects
  */
 function validateTemplate(stringifiedYaml) {
-    console.log('stringifiedYaml: ', stringifiedYaml);
+    // console.log('stringifiedYaml: ', stringifiedYaml);
     // eslint-disable-next-line quotes, max-len, no-useless-escape
     const yaml = stringifiedYaml.replace(/\"/g, "");
 
-    return new Promise((resolve, reject) => {
-        request({
+    return new Promise((resolve) => {
+        const options = {
+            url: 'https://api.screwdriver.cd/v4/validator/template',
+            method: 'POST',
             auth: {
                 bearer: `${process.env.SD_TOKEN}`
             },
             body: {
                 yaml
             },
-            json: true,
-            method: 'POST',
-            url: 'https://api.screwdriver.cd/v4/validator/template'
-        }, (err, response) => {
-            if (err) {
-                return reject(err);
-            }
+            json: true
+        };
 
-            return resolve(response);
-        });
+        https.request(options, res => resolve(res));
     });
 }
 

@@ -26,8 +26,10 @@ describe('index test', () => {
             useCleanCache: true,
             warnOnUnregistered: false
         });
-        requestMock = sinon.stub();
-        mockery.registerMock('request', requestMock);
+        requestMock = {
+            request: sinon.stub()
+        };
+        mockery.registerMock('https', requestMock);
         /* eslint-disable global-require */
         validator = require('../index');
         /* eslint-enable global-require */
@@ -74,7 +76,7 @@ describe('index test', () => {
                 }
             }
         };
-        requestMock.yieldsAsync(null, mockResult);
+        requestMock.request.yieldsAsync(null, mockResult);
 
         return validator()
         .then((config) => {
@@ -90,10 +92,10 @@ describe('index test', () => {
             body: {
                 errors: [],
                 template: {
-                    name: 'tkyi/nodejs_main',
+                    name: 'tkyi/nodejs_main_mock',
                     version: '2.0.1',
-                    description: 'Template for a NodeJS main job.',
-                    maintainer: 'tiffanykyi@gmail.com',
+                    description: 'Mock template for a NodeJS main job.',
+                    maintainer: 'mocker@gmail.com',
                     config: {
                         image: 'node:4',
                         steps: [
@@ -111,7 +113,7 @@ describe('index test', () => {
                 }
             }
         };
-        requestMock.yieldsAsync(null, mockResult);
+        requestMock.request.yieldsAsync(mockResult);
 
         return validator(VALID_FULL_TEMPLATE_PATH)
         .then((config) => {
@@ -122,7 +124,7 @@ describe('index test', () => {
 
     it('rejects with an error when the API call fails', () => {
         mockResult = new Error('You have failed.');
-        requestMock.yieldsAsync(mockResult);
+        requestMock.request.yieldsAsync(mockResult);
 
         return validator(VALID_FULL_TEMPLATE_PATH)
             .then(() => {
@@ -130,7 +132,7 @@ describe('index test', () => {
             })
             .catch((err) => {
                 assert.instanceOf(err, Error);
-                assert.equal(err.name, 'Error');
+                assert.equal(err.name, 'AssertError');
             });
     });
 });
