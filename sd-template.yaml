@@ -1,0 +1,8 @@
+name: template/main
+version: 1.0.0
+description: Validates the template yaml
+maintainer: tiffanykyi@gmail.com
+config:
+    image: node:6
+    steps:
+        - validate: node ./index.js

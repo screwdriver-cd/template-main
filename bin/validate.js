@@ -10,6 +10,9 @@ const request = require('request');
  * @return {Promise}                Promises to return a stringified yaml
  */
 function stringifyYaml(pathToYaml) {
+    console.log(pathToYaml);
+    console.log(JSON.stringify(fs.readFileSync(pathToYaml, 'utf8'), null, 4));
+
     return Promise.resolve(JSON.stringify(fs.readFileSync(pathToYaml, 'utf8'), null, 4));
 }
 
@@ -21,8 +24,6 @@ function stringifyYaml(pathToYaml) {
  */
 function validateTemplate(stringifiedYaml) {
     console.log('stringifiedYaml: ', stringifiedYaml);
-    // eslint-disable-next-line quotes, max-len, no-useless-escape
-    const yaml = stringifiedYaml.replace(/\"/g, "");
 
     return new Promise((resolve, reject) => {
         request({
@@ -30,7 +31,7 @@ function validateTemplate(stringifiedYaml) {
                 bearer: `${process.env.SD_TOKEN}`
             },
             body: {
-                yaml
+                yaml: stringifiedYaml
             },
             json: true,
             method: 'POST',

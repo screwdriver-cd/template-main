@@ -1,0 +1,11 @@
+name: tkyi/nodejs_main
+version: 2.0.1
+description: Template for a NodeJS main job.
+maintainer: tiffanykyi@gmail.com
+config:
+  image: node:4
+  steps:
+    - install: npm install
+    - test: npm test
+  environment:
+    LABELS: [stable, latest]

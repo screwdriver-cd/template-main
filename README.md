@@ -1,18 +1,23 @@
 # template-main
 [![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] [![Dependency Status][daviddm-image]][daviddm-url] ![License][license-image]
 
-> Validates and publishes templates
+> Validates templates
 
 ## Usage
 
-```bash
-npm install screwdriver-template-main
+```yaml
+jobs: 
+    main:
+        template: template/main
+    publish: 
+        template: template/publish
 ```
 
 ## Testing
 
 ```bash
-npm test
+$ npm install
+$ npm test
 ```
 
 ## License

@@ -7,15 +7,11 @@ shared:
 jobs:
     main:
         steps:
-            - install: npm install
-            - test: npm test
+            - validate: node ./index.js
 
     publish:
         steps:
-            - install: npm install semantic-release
-            - publish: npm run semantic-release
+            - publish: template/publish
         secrets:
-            # Publishing to NPM
-            - NPM_TOKEN
             # Pushing tags to Git
             - GH_TOKEN
