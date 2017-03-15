@@ -12,10 +12,9 @@ describe('index test', () => {
     let mockResult;
 
     process.env.SD_TOKEN = 'blah';
+    process.env.TEMPLATES = '';
 
     it('uses the default path to validate a template', () => {
-        process.env.TEMPLATES = '';
-
         // eslint-disable-next-line quotes, max-len
         mockResult = {
             statusCode: 200,

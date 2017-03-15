@@ -56,6 +56,7 @@ module.exports = (templatePath) => {
     const resultsArr = [];
 
     if (process.env.TEMPLATES) {
+        console.log('using env vars');
         let paths = process.env.TEMPLATES;
 
         paths = JSON.parse(paths);
@@ -66,6 +67,7 @@ module.exports = (templatePath) => {
                             .then(templateJson => JSON.parse(templateJson)));
         });
     } else {
+        console.log('single path');
         const path = templatePath || './sd-template.yaml';
 
         resultsArr.push(validateTemplate(path)
