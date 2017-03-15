@@ -12,7 +12,7 @@ describe('index test', () => {
     let mockResult;
 
     process.env.SD_TOKEN = 'blah';
-    process.env.TEMPLATES = '';
+//    process.env.TEMPLATES = '';
 
     it('uses the default path to validate a template', () => {
         // eslint-disable-next-line quotes, max-len
@@ -104,5 +104,44 @@ describe('index test', () => {
                 assert.instanceOf(err, Error);
                 assert.equal(err.name, 'TypeError');
             });
+    });
+
+    it('calls the API to validate a template on all templates passed in through env vars', () => {
+        process.env.TEMPLATES = '';
+        mockResult = {
+            statusCode: 200,
+            body: {
+                errors: [],
+                template: {
+                    name: 'tkyi/nodejs_main_mock',
+                    version: '2.0.1',
+                    description: 'Mock template for a NodeJS main job.',
+                    maintainer: 'mocker@gmail.com',
+                    config: {
+                        image: 'node:4',
+                        steps: [
+                            {
+                                install: 'npm install'
+                            },
+                            {
+                                test: 'npm test'
+                            }
+                        ],
+                        environment: {
+                            LABELS: ['stable', 'latest']
+                        }
+                    }
+                }
+            }
+        };
+        nock('https://api.screwdriver.cd')
+            .post('/v4/validator/template')
+            .reply(200, mockResult);
+
+        return validator(VALID_FULL_TEMPLATE_PATH)
+        .then((res) => {
+            assert.isObject(res);
+            assert.deepEqual(res, mockResult);
+        });
     });
 });

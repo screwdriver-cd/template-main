@@ -56,6 +56,7 @@ module.exports = (templatePath) => {
     const resultsArr = [];
 
     if (process.env.TEMPLATES) {
+        console.log(process.env.TEMPLATES);
         console.log('using env vars');
         let paths = process.env.TEMPLATES;
 
