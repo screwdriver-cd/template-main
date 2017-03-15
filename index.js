@@ -1,43 +1,48 @@
 'use strict';
 
-const fs = require('fs');
 const https = require('https');
-
-/**
- * Will stringify a sd-template.yaml file
- * @method stringifyYaml
- * @param  {String}      pathToYaml Path to the Screwdriver template yaml
- * @return {Promise}                Promises to return a stringified yaml
- */
-function stringifyYaml(pathToYaml) {
-    return Promise.resolve(JSON.stringify(fs.readFileSync(pathToYaml, 'utf8'), null, 4));
-}
+const fs = require('fs');
 
 /**
  * Validates the template yaml by making a call to the SDAPI /validator/template endpoint
  * @method validateTemplate
+ * @param  pathToTemplate    Path to template file
  * @return {Promise}         Will reject with an error if the API request returns an error
  *                           Will resolve with a JSON object with the errors and template objects
  */
-function validateTemplate(stringifiedYaml) {
-    // console.log('stringifiedYaml: ', stringifiedYaml);
-    // eslint-disable-next-line quotes, max-len, no-useless-escape
-    const yaml = stringifiedYaml.replace(/\"/g, "");
+function validateTemplate(pathToTemplate) {
+    const options = {
+        hostname: 'api.screwdriver.cd',
+        port: 443,
+        path: '/v4/validator/template',
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${process.env.SD_TOKEN}`,
+            'Content-Type': 'application/json'
+        }
+    };
 
-    return new Promise((resolve) => {
-        const options = {
-            url: 'https://api.screwdriver.cd/v4/validator/template',
-            method: 'POST',
-            auth: {
-                bearer: `${process.env.SD_TOKEN}`
-            },
-            body: {
-                yaml
-            },
-            json: true
-        };
+    const yaml = fs.readFileSync(pathToTemplate, 'utf8');
 
-        https.request(options, res => resolve(res));
+    return new Promise((resolve, reject) => {
+        const data = [];
+        const req = https.request(options, (res) => {
+            res.setEncoding('utf8');
+            res.on('data', (chunk) => {
+                data.push(chunk);
+            });
+            res.on('end', () => resolve(data.join('')));
+        });
+
+        req.on('error', (e) => {
+            console.log(`There was a problem with request: ${e.message}`);
+
+            return reject(e);
+        });
+
+        // write data to request body
+        req.write(JSON.stringify({ yaml }));
+        req.end();
     });
 }
 
@@ -50,9 +55,8 @@ function validateTemplate(stringifiedYaml) {
 module.exports = (templatePath) => {
     const path = templatePath || './sd-template.yaml';
 
-    return stringifyYaml(path)
-        .then(validateTemplate)
+    return validateTemplate(path)
         // do some meta set thing here with the JSON object??
-        .then(templateJson => templateJson)
-        .catch(err => Promise.reject(err));
+        .then(templateJson => JSON.parse(templateJson))
+        .catch(Promise.reject);
 };

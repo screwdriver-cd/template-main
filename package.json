@@ -36,11 +36,9 @@
     "eslint": "^3.9.1",
     "eslint-config-screwdriver": "^2.0.9",
     "jenkins-mocha": "^3.0.0",
-    "mockery": "2.0.0",
-    "sinon": "1.17.7"
+    "nock": "^9.0.9"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "release": {
     "debug": false,
     "verifyConditions": {
