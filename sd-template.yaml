@@ -1,6 +1,6 @@
 name: template/main
 version: 1.0.0
-description: Validates the template yaml
+description: Validates the template yaml from sd-template.yaml
 maintainer: tiffanykyi@gmail.com
 config:
     image: node:6

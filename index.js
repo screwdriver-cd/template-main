@@ -53,10 +53,24 @@ function validateTemplate(pathToTemplate) {
  * @return {Promise}             Resolves with a template JSON object
  */
 module.exports = (templatePath) => {
-    const path = templatePath || './sd-template.yaml';
+    const resultsArr = [];
 
-    return validateTemplate(path)
-        // do some meta set thing here with the JSON object??
-        .then(templateJson => JSON.parse(templateJson))
-        .catch(Promise.reject);
+    if (process.env.TEMPLATES) {
+        let paths = process.env.TEMPLATES;
+
+        paths = JSON.parse(paths);
+        paths.forEach((path) => {
+            console.log('in the loop. THIS IS A PATH:', path);
+
+            resultsArr.push(validateTemplate(path)
+                            .then(templateJson => JSON.parse(templateJson)));
+        });
+    } else {
+        const path = templatePath || './sd-template.yaml';
+
+        resultsArr.push(validateTemplate(path)
+                        .then(templateJson => JSON.parse(templateJson)));
+    }
+
+    return Promise.all(resultsArr);
 };

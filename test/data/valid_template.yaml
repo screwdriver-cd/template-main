@@ -1,6 +1,6 @@
 name: tkyi/nodejs_main
 version: 2.0.1
-description: Template for a NodeJS main job.
+description: Template for a NodeJS main job from test/data/valid_template.yaml
 maintainer: tiffanykyi@gmail.com
 config:
   image: node:4

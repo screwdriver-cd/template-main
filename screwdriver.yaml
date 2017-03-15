@@ -3,10 +3,15 @@ workflow:
 
 shared:
     image: node:6
-
+    environment:
+        TEMPLATES:
+            - ./sd-template.yaml
+            - ./test/data/valid_template.yaml
 jobs:
     main:
         steps:
+            - install: npm install
+            - test: npm test
             - validate: node ./index.js
 
     publish:
