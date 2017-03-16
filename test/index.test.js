@@ -12,7 +12,7 @@ describe('index test', () => {
     let mockResult;
 
     process.env.SD_TOKEN = 'blah';
-//    process.env.TEMPLATES = '';
+    process.env.TEMPLATES = '';
 
     it('uses the default path to validate a template', () => {
         // eslint-disable-next-line quotes, max-len
@@ -107,7 +107,7 @@ describe('index test', () => {
     });
 
     it('calls the API to validate a template on all templates passed in through env vars', () => {
-        process.env.TEMPLATES = '';
+        process.env.TEMPLATES = '["./sd-template.yaml","./test/data/valid_template.yaml"]';
         mockResult = {
             statusCode: 200,
             body: {
@@ -138,7 +138,7 @@ describe('index test', () => {
             .post('/v4/validator/template')
             .reply(200, mockResult);
 
-        return validator(VALID_FULL_TEMPLATE_PATH)
+        return validator()
         .then((res) => {
             assert.isObject(res);
             assert.deepEqual(res, mockResult);
