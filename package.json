@@ -8,6 +8,9 @@
     "test": "jenkins-mocha --recursive",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
+  "bin": {
+    "template-publish": "./publish.js"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:screwdriver-cd/template-main.git"
@@ -35,9 +38,14 @@
     "chai": "^3.5.0",
     "eslint": "^3.9.1",
     "eslint-config-screwdriver": "^2.0.9",
-    "jenkins-mocha": "^3.0.0"
+    "jenkins-mocha": "^3.0.0",
+    "mockery": "^2.0.0",
+    "sinon": "^2.1.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "js-yaml": "^3.8.3",
+    "request": "^2.81.0"
+  },
   "release": {
     "debug": false,
     "verifyConditions": {
