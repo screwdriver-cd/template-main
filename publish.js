@@ -2,6 +2,9 @@
 
 'use strict';
 
-const index = require('./index');
-
-index.publishTemplate();
+require('./index').publishTemplate()
+    .then(console.log)
+    .catch((err) => {
+        console.log(err);
+        process.exit(1);
+    });

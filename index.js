@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require('request');
+const request = require('request-promise');
 const fs = require('fs');
 const Yaml = require('js-yaml');
 
@@ -19,21 +19,23 @@ function publishTemplate() {
             bearer: process.env.SD_TOKEN
         },
         method: 'POST',
-        url: 'https://api.screwdriver.cd:443/v4/templates'
+        url: 'https://api.screwdriver.cd/v4/templates',
+        resolveWithFullResponse: true,
+        simple: false
     };
 
-    request(params, (err, response, body) => {
-        if (err) {
-            throw new Error(`Error sending request: ${err}`);
-        } else if (response.statusCode !== 201) {
-            throw new Error('Template was not published. ' +
-                `${body.statusCode} (${body.error}): ${body.message}`);
-        } else {
-            console.log('Template successfully published.');
-        }
-    });
+    return request(params)
+        .then((response) => {
+            const body = response.body;
 
-    return null;
+            if (response.statusCode !== 201) {
+                throw new Error('Template was not published. ' +
+                `${body.statusCode} (${body.error}): ${body.message}`);
+            }
+
+            return Promise.resolve('Template successfully published.');
+        })
+        .catch(err => Promise.reject(err.message));
 }
 
 module.exports = {

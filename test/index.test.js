@@ -43,7 +43,7 @@ describe('Template Publish', () => {
 
         mockery.registerMock('fs', fsMock);
         mockery.registerMock('js-yaml', YamlMock);
-        mockery.registerMock('request', requestMock);
+        mockery.registerMock('request-promise', requestMock);
 
         /* eslint-disable global-require */
         index = require('../index');
@@ -61,10 +61,11 @@ describe('Template Publish', () => {
     });
 
     it('throws error when request yields an error', () => {
-        const error = new Error('error');
+        requestMock.rejects(new Error('error'));
 
-        requestMock.yields(error);
-        assert.throws(index.publishTemplate, Error, 'Error sending request: Error: error');
+        return index.publishTemplate()
+            .then(() => assert.fail('should not get here'))
+            .catch(err => assert.equal(err, 'error'));
     });
 
     it('throws error for the corresponding request error status code if not 201', () => {
@@ -77,9 +78,12 @@ describe('Template Publish', () => {
             }
         };
 
-        requestMock.yields(null, responseFake, responseFake.body);
-        assert.throws(index.publishTemplate, Error,
-            'Template was not published. 403 (Forbidden): Fake forbidden message');
+        requestMock.resolves(responseFake);
+
+        return index.publishTemplate()
+            .then(() => assert.fail('should not get here'))
+            .catch(err => assert.equal(err,
+                'Template was not published. 403 (Forbidden): Fake forbidden message'));
     });
 
     it('succeeds and does not throw an error if request status code is 201', () => {
@@ -88,7 +92,9 @@ describe('Template Publish', () => {
             body: yamlReturn
         };
 
-        requestMock.yields(null, responseFake, responseFake.body);
-        assert.doesNotThrow(index.publishTemplate);
+        requestMock.resolves(responseFake);
+
+        return index.publishTemplate()
+            .then(msg => assert.equal(msg, 'Template successfully published.'));
     });
 });
