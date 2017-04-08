@@ -41,12 +41,9 @@ function publishTemplate() {
 /**
  * Validates the template yaml by posting to the SDAPI /validator/template endpoint
  * @method validateTemplate
- * @return {Request}         Request object from post call to SDAPI
+ * @return {Promise}         Resolves when template is valid/rejects when error or invalid
  */
 function validateTemplate() {
-    let i;
-    let errorMessage;
-
     const path = process.env.SD_TEMPLATE_PATH || './sd-template.yaml';
     const json = JSON.stringify(Yaml.safeLoad(fs.readFileSync(path, 'utf8')));
     const params = {
@@ -61,22 +58,23 @@ function validateTemplate() {
         url: 'https://api.screwdriver.cd/v4/validator/template'
     };
 
-    return request(params, (err, response, body) => {
-        if (err) {
-            throw new Error(`Error sending validate request: ${err}`);
-        } else if (body.errors.length > 0) {
-            errorMessage = 'Template is not valid for the following reasons:';
-            for (i = 0; i < body.errors.length; i += 1) {
-                /* eslint-disable prefer-template */
-                errorMessage += `\n ${JSON.stringify(body.errors[i], null, 3)}`;
-                /* eslint-enable prefer-template */
+    return request(params)
+        .then((response) => {
+            if (response.errors.length > 0) {
+                let errorMessage = 'Template is not valid for the following reasons:';
+
+                response.errors.forEach((err) => {
+                    /* eslint-disable prefer-template */
+                    errorMessage += `\n ${JSON.stringify(err, null, 3)}`;
+                    /* eslint-enable prefer-template */
+                });
+
+                throw new Error(errorMessage);
             }
 
-            throw new Error(errorMessage);
-        } else {
-            console.log('Template is valid.');
-        }
-    }).headers;
+            return Promise.resolve('Template is valid.');
+        })
+        .catch(err => Promise.reject(err.message));
 }
 
 module.exports = {

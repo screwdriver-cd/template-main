@@ -1,0 +1,18 @@
+Template is not valid for the following reasons:
+ {
+   "message": "\"steps\" is required",
+   "path": "config.steps",
+   "type": "any.required",
+   "context": {
+      "key": "steps"
+   }
+}
+ {
+   "message": "\"doesntexist\" is not allowed",
+   "path": "doesntexist",
+   "type": "object.allowUnknown",
+   "context": {
+      "child": "doesntexist",
+      "key": "doesntexist"
+   }
+}

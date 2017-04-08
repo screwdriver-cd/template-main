@@ -9,7 +9,8 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "bin": {
-    "template-publish": "./publish.js"
+    "template-publish": "./publish.js",
+    "template-validate": "./validate.js"
   },
   "repository": {
     "type": "git",

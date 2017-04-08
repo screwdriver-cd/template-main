@@ -3,8 +3,9 @@
 const assert = require('chai').assert;
 const mockery = require('mockery');
 const sinon = require('sinon');
+const fs = require('fs');
 
-describe('Template Publish', () => {
+describe('Templates', () => {
     let requestMock;
     let YamlMock;
     let fsMock;
@@ -18,6 +19,10 @@ describe('Template Publish', () => {
         });
     });
 
+    after(() => {
+        mockery.disable();
+    });
+
     beforeEach(() => {
         requestMock = sinon.stub();
         YamlMock = {
@@ -26,24 +31,10 @@ describe('Template Publish', () => {
         fsMock = {
             readFileSync: sinon.stub()
         };
-        yamlReturn = {
-            name: 'template/test',
-            version: '1.0.0',
-            description: 'Publishes the template yaml from sd-template.yaml',
-            maintainer: 'tiffanykyi@gmail.com',
-            config: {
-                image: 'node:6',
-                steps: [
-                    { publish: 'node ./publish.js' }
-                ]
-            }
-        };
-
-        YamlMock.safeLoad.returns(yamlReturn);
 
         mockery.registerMock('fs', fsMock);
-        mockery.registerMock('js-yaml', YamlMock);
         mockery.registerMock('request-promise', requestMock);
+        mockery.registerMock('js-yaml', YamlMock);
 
         /* eslint-disable global-require */
         index = require('../index');
@@ -56,45 +47,146 @@ describe('Template Publish', () => {
         index = null;
     });
 
-    after(() => {
-        mockery.disable();
-    });
+    describe('Template Publish', () => {
+        beforeEach(() => {
+            yamlReturn = {
+                name: 'template/test',
+                version: '1.0.0',
+                description: 'Publishes the template yaml from sd-template.yaml',
+                maintainer: 'tiffanykyi@gmail.com',
+                config: {
+                    image: 'node:6',
+                    steps: [
+                        { publish: 'node ./publish.js' }
+                    ]
+                }
+            };
 
-    it('throws error when request yields an error', () => {
-        requestMock.rejects(new Error('error'));
+            YamlMock.safeLoad.returns(yamlReturn);
+        });
 
-        return index.publishTemplate()
-            .then(() => assert.fail('should not get here'))
-            .catch(err => assert.equal(err, 'error'));
-    });
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
 
-    it('throws error for the corresponding request error status code if not 201', () => {
-        const responseFake = {
-            statusCode: 403,
-            body: {
+            return index.publishTemplate()
+                .then(() => assert.fail('should not get here'))
+                .catch(err => assert.equal(err, 'error'));
+        });
+
+        it('throws error for the corresponding request error status code if not 201', () => {
+            const responseFake = {
                 statusCode: 403,
-                error: 'Forbidden',
-                message: 'Fake forbidden message'
-            }
-        };
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
 
-        requestMock.resolves(responseFake);
+            requestMock.resolves(responseFake);
 
-        return index.publishTemplate()
-            .then(() => assert.fail('should not get here'))
-            .catch(err => assert.equal(err,
-                'Template was not published. 403 (Forbidden): Fake forbidden message'));
+            return index.publishTemplate()
+                .then(() => assert.fail('should not get here'))
+                .catch(err => assert.equal(err,
+                    'Template was not published. 403 (Forbidden): Fake forbidden message'));
+        });
+
+        it('succeeds and does not throw an error if request status code is 201', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: yamlReturn
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.publishTemplate()
+                .then(msg => assert.equal(msg, 'Template successfully published.'));
+        });
     });
 
-    it('succeeds and does not throw an error if request status code is 201', () => {
-        const responseFake = {
-            statusCode: 201,
-            body: yamlReturn
-        };
+    describe('Template Validate', () => {
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
 
-        requestMock.resolves(responseFake);
+            return index.validateTemplate()
+                .then(() => assert.fail('should not get here'))
+                .catch(err => assert.equal(err, 'error'));
+        });
 
-        return index.publishTemplate()
-            .then(msg => assert.equal(msg, 'Template successfully published.'));
+        it('throws corresponding request errors if response includes errors', () => {
+            yamlReturn = {
+                name: 'template/test',
+                version: '1.0.0',
+                doesntexist: 'bad',
+                description: 'Publishes the template yaml from sd-template.yaml',
+                maintainer: 'tiffanykyi@gmail.com',
+                config: {
+                    image: 'node:6'
+                }
+            };
+
+            YamlMock.safeLoad.returns(yamlReturn);
+
+            const responseFake = {
+                errors: [
+                    {
+                        message: '"steps" is required',
+                        path: 'config.steps',
+                        type: 'any.required',
+                        context: {
+                            key: 'steps'
+                        }
+                    },
+                    {
+                        message: '"doesntexist" is not allowed',
+                        path: 'doesntexist',
+                        type: 'object.allowUnknown',
+                        context: {
+                            child: 'doesntexist',
+                            key: 'doesntexist'
+                        }
+                    }
+                ],
+                template: yamlReturn
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.validateTemplate()
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(
+                        err,
+                        fs.readFileSync('./test/data/template_invalid.txt').toString()
+                    );
+                });
+        });
+
+        it('succeeds and does not throw an error if response includes no errors', () => {
+            yamlReturn = {
+                name: 'template/test',
+                version: '1.0.0',
+                description: 'Publishes the template yaml from sd-template.yaml',
+                maintainer: 'tiffanykyi@gmail.com',
+                config: {
+                    image: 'node:6',
+                    steps: [
+                        { publish: 'node ./publish.js' }
+                    ]
+                }
+            };
+
+            YamlMock.safeLoad.returns(yamlReturn);
+
+            const responseFake = {
+                errors: [],
+                template: yamlReturn
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.validateTemplate()
+                .then(msg => assert.equal(msg, 'Template is valid.'));
+        });
     });
 });
