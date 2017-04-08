@@ -9,6 +9,25 @@
 npm install screwdriver-template-main
 ```
 
+### Publishing a template using Screwdriver
+
+To publish a new template, installs the `screwdriver-template-main` npm package, and run the `template-publish` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
+
+To publish multiple templates in the same repo, a template maintainer would use the following pattern in their `screwdriver.yaml`:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    main:  
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/template-publish
+        environment:
+            SD_TEMPLATE_PATH: ./path/to/template.yaml
+```
+
+
 ## Testing
 
 ```bash
