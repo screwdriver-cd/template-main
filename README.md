@@ -37,15 +37,14 @@ To publish multiple templates in the same repo, a template maintainer would use 
 shared:
     image: node:6
 jobs:
+    # this job is run by the PRs as well
     main:  
         steps:
             - install: npm install screwdriver-template-main
-            # this is run by the PRs as well
             - validate: ./node_modules/.bin/template-validate
     publish:
         steps:
             - install: npm install screwdriver-template-main
-            # publishing also validates
             - publish: ./node_modules/.bin/template-publish
 ```
 
