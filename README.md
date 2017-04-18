@@ -9,7 +9,7 @@
 npm install screwdriver-template-main
 ```
 
-### Validating a template using Screwdriver
+### Validating a template
 
 Run the `template-validate` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
 
@@ -27,7 +27,7 @@ jobs:
             SD_TEMPLATE_PATH: ./path/to/template.yaml
 ```
 
-### Publishing a template using Screwdriver
+### Publishing a template
 
 Run the `template-publish` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
 
