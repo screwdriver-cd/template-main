@@ -83,7 +83,7 @@ function publishTemplate(config) {
             `${body.statusCode} (${body.error}): ${body.message}`);
         }
 
-        return 'Template was successfully published';
+        return `Template ${body.name}@${body.version} was successfully published`;
     });
 }
 
