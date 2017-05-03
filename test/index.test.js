@@ -152,7 +152,8 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.publishTemplate(templateConfig)
-                .then(msg => assert.equal(msg, 'Template was successfully published'));
+                .then(msg => assert.equal(msg, 'Template ' +
+                    `${templateConfig.name}@${templateConfig.version} was successfully published`));
         });
     });
 });
