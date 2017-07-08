@@ -13,7 +13,7 @@ npm install screwdriver-template-main
 
 Run the `template-validate` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
 
-To validate multiple templates in the same repo, a template maintainer would use the following pattern in their `screwdriver.yaml`:
+Example `screwdriver.yaml`:
 
 ```yaml
 shared:
@@ -31,13 +31,13 @@ jobs:
 
 Run the `template-publish` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
 
-To publish multiple templates in the same repo, a template maintainer would use the following pattern in their `screwdriver.yaml`:
+Example `screwdriver.yaml` with validation and publishing:
 
 ```yaml
 shared:
     image: node:6
 jobs:
-    # this job is run by the PRs as well
+    # the main job is run in pull requests as well
     main:  
         steps:
             - install: npm install screwdriver-template-main
@@ -46,7 +46,12 @@ jobs:
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
+        
 ```
+
+Create a Screwdriver pipeline with your template repo and start the build to validate and publish it.
+
+To update a Screwdriver template, make changes in your SCM repository and rerun the pipeline build.
 
 ## Testing
 
