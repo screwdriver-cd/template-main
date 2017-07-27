@@ -87,8 +87,48 @@ function publishTemplate(config) {
     });
 }
 
+/**
+ * Tags a specific template version by posting to the SDAPI /templates/templateName/tag endpoint
+ * @method tagTemplate
+ * @param  {Object}    config
+ * @param  {String}    config.name    Template name
+ * @param  {String}    config.tag     Template tag
+ * @param  {String}    config.version Template version
+ * @return {Promise}                  Resolves if tagged successfully
+ */
+function tagTemplate({ name, tag, version }) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
+    const templateTag = encodeURIComponent(tag);
+    const url = URL.resolve(hostname, `templates/${templateName}/${templateTag}`);
+
+    return request({
+        method: 'PUT',
+        url,
+        auth: {
+            bearer: process.env.SD_TOKEN
+        },
+        json: true,
+        body: {
+            version
+        },
+        resolveWithFullResponse: true,
+        simple: false
+    }).then((response) => {
+        const body = response.body;
+
+        if (response.statusCode !== 201) {
+            throw new Error('Error tagging template. ' +
+            `${body.statusCode} (${body.error}): ${body.message}`);
+        }
+
+        return `Template ${body.name}@${body.version} was successfully tagged as ${tag}`;
+    });
+}
+
 module.exports = {
     loadYaml,
     validateTemplate,
-    publishTemplate
+    publishTemplate,
+    tagTemplate
 };
