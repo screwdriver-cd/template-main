@@ -4,6 +4,8 @@ const assert = require('chai').assert;
 const mockery = require('mockery');
 const sinon = require('sinon');
 
+sinon.assert.expose(assert, { prefix: '' });
+
 describe('index', () => {
     let requestMock;
     let YamlMock;
@@ -72,8 +74,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'))
-                .catch(err => assert.equal(err.message, 'error'));
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error if response template is invalid', () => {
@@ -92,14 +96,13 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'))
-                .catch(err => assert.equal(
-                    err.message,
-                    'Template is not valid for the following reasons:\n' +
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message, 'Template is not valid for the following reasons:\n' +
                     '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
                     '\n    "type": "any.required",' +
-                    '\n    "context": {\n        "key": "steps"\n    }\n},')
-                );
+                    '\n    "context": {\n        "key": "steps"\n    }\n},');
+                });
         });
 
         it('resolves if template is valid', () => {
@@ -120,8 +123,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'))
-                .catch(err => assert.equal(err.message, 'error'));
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error for the corresponding request error status code if not 201', () => {
@@ -137,10 +142,11 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'))
-                .catch(err => assert.equal(err.message,
-                    'Error publishing template. 403 (Forbidden): Fake forbidden message')
-                );
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message,
+                        'Error publishing template. 403 (Forbidden): Fake forbidden message');
+                });
         });
 
         it('succeeds and does not throw an error if request status code is 201', () => {
@@ -154,6 +160,72 @@ describe('index', () => {
             return index.publishTemplate(templateConfig)
                 .then(msg => assert.equal(msg, 'Template ' +
                     `${templateConfig.name}@${templateConfig.version} was successfully published`));
+        });
+    });
+
+    describe('Template Tag', () => {
+        const config = {
+            name: 'template/test',
+            tag: 'stable',
+            version: '1.0.0'
+        };
+
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
+
+            return index.tagTemplate(config)
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message, 'error');
+                });
+        });
+
+        it('throws error for the corresponding request error status code if not 201', () => {
+            const responseFake = {
+                statusCode: 403,
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.tagTemplate(config)
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message,
+                        'Error tagging template. 403 (Forbidden): Fake forbidden message');
+                });
+        });
+
+        it('succeeds and does not throw an error if request status code is 201', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: templateConfig
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.tagTemplate(config)
+                .then((msg) => {
+                    assert.equal(msg, 'Template ' +
+                    `${config.name}@${config.version} was successfully tagged as ${config.tag}`);
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/stable',
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        body: {
+                            version: '1.0.0'
+                        },
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
         });
     });
 });

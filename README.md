@@ -46,7 +46,28 @@ jobs:
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
-        
+```
+
+### Tagging a template
+
+Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, tag, and version. The version must be an exact version, not just a major or major.minor one.
+
+Example `screwdriver.yaml` with validation and publishing and tagging:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    # the main job is run in pull requests as well
+    main:  
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/template-validate
+    publish:
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/template-publish
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.2.3 --tag stable
 ```
 
 Create a Screwdriver pipeline with your template repo and start the build to validate and publish it.

@@ -1,7 +1,7 @@
 {
   "name": "screwdriver-template-main",
   "version": "0.0.1",
-  "description": "Validates and publishes templates",
+  "description": "Validates, publishes, and tags templates",
   "main": "index.js",
   "scripts": {
     "pretest": "eslint .",
@@ -10,7 +10,8 @@
   },
   "bin": {
     "template-publish": "./publish.js",
-    "template-validate": "./validate.js"
+    "template-validate": "./validate.js",
+    "template-tag": "./tag.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
   },
   "dependencies": {
     "js-yaml": "^3.8.3",
+    "nomnom": "^1.8.1",
     "request": "^2.81.0",
     "request-promise-native": "^1.0.3"
   },
