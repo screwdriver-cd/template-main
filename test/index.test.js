@@ -227,5 +227,33 @@ describe('index', () => {
                     });
                 });
         });
+
+        it('succeeds and does not throw an error if request status code is 200', () => {
+            const responseFake = {
+                statusCode: 200,
+                body: templateConfig
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.tagTemplate(config)
+                .then((msg) => {
+                    assert.equal(msg, 'Template ' +
+                    `${config.name}@${config.version} was successfully tagged as ${config.tag}`);
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        body: {
+                            version: '1.0.0'
+                        },
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
+        });
     });
 });

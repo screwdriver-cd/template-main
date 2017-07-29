@@ -80,7 +80,7 @@ function publishTemplate(config) {
 
         if (response.statusCode !== 201) {
             throw new Error('Error publishing template. ' +
-            `${body.statusCode} (${body.error}): ${body.message}`);
+            `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
         return `Template ${body.name}@${body.version} was successfully published`;
@@ -117,9 +117,9 @@ function tagTemplate({ name, tag, version }) {
     }).then((response) => {
         const body = response.body;
 
-        if (response.statusCode !== 201) {
+        if (response.statusCode !== 201 && response.statusCode !== 200) {
             throw new Error('Error tagging template. ' +
-            `${body.statusCode} (${body.error}): ${body.message}`);
+            `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
         return `Template ${body.name}@${body.version} was successfully tagged as ${tag}`;
