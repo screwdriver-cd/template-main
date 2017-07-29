@@ -100,7 +100,7 @@ function tagTemplate({ name, tag, version }) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
     const templateName = encodeURIComponent(name);
     const templateTag = encodeURIComponent(tag);
-    const url = URL.resolve(hostname, `templates/${templateName}/${templateTag}`);
+    const url = URL.resolve(hostname, `templates/${templateName}/tags/${templateTag}`);
 
     return request({
         method: 'PUT',

@@ -214,7 +214,7 @@ describe('index', () => {
                     `${config.name}@${config.version} was successfully tagged as ${config.tag}`);
                     assert.calledWith(requestMock, {
                         method: 'PUT',
-                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/stable',
+                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
                         auth: {
                             bearer: process.env.SD_TOKEN
                         },
