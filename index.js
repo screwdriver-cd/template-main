@@ -49,7 +49,9 @@ function validateTemplate(config) {
             throw new Error(errorMessage);
         }
 
-        return 'Template is valid';
+        return {
+            valid: true
+        };
     });
 }
 
@@ -83,7 +85,10 @@ function publishTemplate(config) {
             `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
-        return `Template ${body.name}@${body.version} was successfully published`;
+        return {
+            name: body.name,
+            version: body.version
+        };
     });
 }
 
@@ -122,7 +127,11 @@ function tagTemplate({ name, tag, version }) {
             `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
-        return `Template ${body.name}@${body.version} was successfully tagged as ${tag}`;
+        return {
+            name,
+            tag,
+            version
+        };
     });
 }
 
