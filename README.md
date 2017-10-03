@@ -27,6 +27,13 @@ jobs:
             SD_TEMPLATE_PATH: ./path/to/template.yaml
 ```
 
+`template-validate` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-validate --json
+{"valid":true}
+```
+
 ### Publishing a template
 
 Run the `template-publish` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
@@ -46,6 +53,13 @@ jobs:
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
+```
+
+`template-publish` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-publish --json
+{name:"template/foo",version:"1.2.3"}
 ```
 
 ### Tagging a template
@@ -73,6 +87,13 @@ jobs:
 Create a Screwdriver pipeline with your template repo and start the build to validate and publish it.
 
 To update a Screwdriver template, make changes in your SCM repository and rerun the pipeline build.
+
+`template-validate` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-publish --json --name templateName --version 1.2.3 --tag stable
+{"name":"templateName","tag":"stable","version":"1.2.3"}
+```
 
 ## Testing
 

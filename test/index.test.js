@@ -114,7 +114,9 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.validateTemplate(templateConfig)
-                .then(msg => assert.equal(msg, 'Template is valid'));
+                .then(result => assert.deepEqual(result, {
+                    valid: true
+                }));
         });
     });
 
@@ -158,8 +160,10 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.publishTemplate(templateConfig)
-                .then(msg => assert.equal(msg, 'Template ' +
-                    `${templateConfig.name}@${templateConfig.version} was successfully published`));
+                .then(result => assert.deepEqual(result, {
+                    name: templateConfig.name,
+                    version: templateConfig.version
+                }));
         });
     });
 
@@ -209,9 +213,12 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.tagTemplate(config)
-                .then((msg) => {
-                    assert.equal(msg, 'Template ' +
-                    `${config.name}@${config.version} was successfully tagged as ${config.tag}`);
+                .then((result) => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        tag: config.tag,
+                        version: config.version
+                    });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
                         url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
@@ -237,9 +244,12 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.tagTemplate(config)
-                .then((msg) => {
-                    assert.equal(msg, 'Template ' +
-                    `${config.name}@${config.version} was successfully tagged as ${config.tag}`);
+                .then((result) => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        version: config.version,
+                        tag: config.tag
+                    });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
                         url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',

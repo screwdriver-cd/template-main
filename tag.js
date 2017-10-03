@@ -20,6 +20,11 @@ const opts = nomnom
         required: true,
         help: 'Tag version'
     })
+    .option('json', {
+        abbr: 'j',
+        flag: true,
+        help: 'Output result as json'
+    })
     .parse();
 
 return index.tagTemplate({
@@ -27,7 +32,15 @@ return index.tagTemplate({
     tag: opts.tag,
     version: opts.version
 })
-.then(console.log)
+.then((result) => {
+    if (!opts.json) {
+        console.log(
+            `Template ${result.name}@${result.version} was successfully tagged as ${result.tag}`
+        );
+    } else {
+        console.log(JSON.stringify(result));
+    }
+})
 .catch((err) => {
     console.error(err);
     process.exit(1);
