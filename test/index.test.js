@@ -74,10 +74,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message, 'error');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error if response template is invalid', () => {
@@ -96,14 +96,15 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    // eslint-disable-next-line max-len
+                    assert.equal(err.message, 'Template is not valid for the following reasons:\n' +
                         // eslint-disable-next-line max-len
-                        assert.equal(err.message, 'Template is not valid for the following reasons:\n' +
-                    '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
-                    '\n    "type": "any.required",' +
-                    '\n    "context": {\n        "key": "steps"\n    }\n},');
-                    });
+                        '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
+                        '\n    "type": "any.required",' +
+                        '\n    "context": {\n        "key": "steps"\n    }\n},');
+                });
         });
 
         it('resolves if template is valid', () => {
@@ -126,10 +127,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message, 'error');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error for the corresponding request error status code if not 201', () => {
@@ -145,11 +146,11 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message,
-                            'Error publishing template. 403 (Forbidden): Fake forbidden message');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message,
+                        'Error publishing template. 403 (Forbidden): Fake forbidden message');
+                });
         });
 
         it('succeeds and does not throw an error if request status code is 201', () => {
@@ -173,10 +174,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.removeTemplate(templateConfig.name)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message, 'error');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error for the corresponding request error status code if not 204', () => {
@@ -192,13 +193,13 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.removeTemplate(templateConfig.name)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     // eslint-disable-next-line max-len
-                        const msg = 'Error removing template template/test. 403 (Forbidden): Fake forbidden message';
+                    const msg = 'Error removing template template/test. 403 (Forbidden): Fake forbidden message';
 
-                        assert.equal(err.message, msg);
-                    });
+                    assert.equal(err.message, msg);
+                });
         });
 
         it('succeeds and does not throw an error if request status code is 204', () => {
@@ -225,10 +226,10 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message, 'error');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message, 'error');
+                });
         });
 
         it('throws error for the corresponding request error status code if not 201', () => {
@@ -244,11 +245,11 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'),
-                    (err) => {
-                        assert.equal(err.message,
-                            'Error tagging template. 403 (Forbidden): Fake forbidden message');
-                    });
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message,
+                        'Error tagging template. 403 (Forbidden): Fake forbidden message');
+                });
         });
 
         it('succeeds and does not throw an error if request status code is 201', () => {
