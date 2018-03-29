@@ -18,14 +18,14 @@ const opts = nomnom
     .parse();
 
 return index.removeTemplate(opts.name)
-.then((result) => {
-    if (!opts.json) {
-        console.log(`Template ${result.name} was successfully removed`);
-    } else {
-        console.log(JSON.stringify(result));
-    }
-})
-.catch((err) => {
-    console.error(err);
-    process.exit(1);
-});
+    .then((result) => {
+        if (!opts.json) {
+            console.log(`Template ${result.name} was successfully removed`);
+        } else {
+            console.log(JSON.stringify(result));
+        }
+    })
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
