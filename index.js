@@ -100,7 +100,7 @@ function publishTemplate(config) {
  */
 function removeTemplate(name) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name)
+    const templateName = encodeURIComponent(name);
     const url = URL.resolve(hostname, `templates/${templateName}`);
 
     return request({
