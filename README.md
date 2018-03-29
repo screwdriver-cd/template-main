@@ -20,6 +20,7 @@ shared:
     image: node:6
 jobs:
     main:
+        requires: [~pr, ~commit]
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate
@@ -44,12 +45,13 @@ Example `screwdriver.yaml` with validation and publishing:
 shared:
     image: node:6
 jobs:
-    # the main job is run in pull requests as well
     main:
+        requires: [~pr, ~commit]
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate
     publish:
+        requires: main
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
@@ -66,14 +68,23 @@ $ ./node_modules/.bin/template-publish --json
 
 To remove a template, run the `template-remove` script. You'll need to add an argument for the template name. Removing a template will remove _all_ of its versions.
 
-Example `screwdriver.yaml` with template removal:
+Example `screwdriver.yaml` with validation and publishing, and template removal as a detached job:
 
 ```yaml
 shared:
     image: node:6
 jobs:
-    # the main job is run in pull requests as well
     main:
+        requires: [~pr, ~commit]
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/template-validate
+    publish:
+        requires: main
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/template-publish
+    remove_template:
         steps:
             - install: npm install screwdriver-template-main
             - remove: ./node_modules/.bin/template-remove --name templateName
@@ -96,12 +107,13 @@ Example `screwdriver.yaml` with validation and publishing and tagging:
 shared:
     image: node:6
 jobs:
-    # the main job is run in pull requests as well
     main:
+        requires: [~pr, ~commit]
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate
     publish:
+        requires: main
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
