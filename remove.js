@@ -17,7 +17,7 @@ const opts = nomnom
     })
     .parse();
 
-return index.removeTemplate({ name: opts.name })
+return index.removeTemplate(opts.name)
 .then((result) => {
     if (!opts.json) {
         console.log(`Template ${result.name} was successfully removed`);
