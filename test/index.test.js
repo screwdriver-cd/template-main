@@ -212,6 +212,8 @@ describe('index', () => {
         });
     });
     describe('Template Tag', () => {
+        const url = process.env.SD_API_URL
+            || 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable';
         const config = {
             name: 'template/test',
             tag: 'stable',
@@ -265,7 +267,8 @@ describe('index', () => {
                     });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
-                        url: 'https://beta.api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
+                        // eslint-disable-next-line max-len
+                        url,
                         auth: {
                             bearer: process.env.SD_TOKEN
                         },
@@ -296,7 +299,8 @@ describe('index', () => {
                     });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
-                        url: 'https://beta.api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
+                        // eslint-disable-next-line max-len
+                        url,
                         auth: {
                             bearer: process.env.SD_TOKEN
                         },
