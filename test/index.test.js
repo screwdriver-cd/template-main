@@ -193,8 +193,10 @@ describe('index', () => {
             return index.removeTemplate(templateConfig.name)
                 .then(() => assert.fail('should not get here'),
                 (err) => {
-                    assert.equal(err.message,
-                        'Error removing template. 403 (Forbidden): Fake forbidden message');
+                    // eslint-disable-next-line max-len
+                    const msg = 'Error removing template template/test. 403 (Forbidden): Fake forbidden message';
+
+                    assert.equal(err.message, msg);
                 });
         });
 

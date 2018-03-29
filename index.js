@@ -115,7 +115,7 @@ function removeTemplate(name) {
         const { body } = response;
 
         if (response.statusCode !== 204) {
-            throw new Error('Error removing template. ' +
+            throw new Error(`Error removing template ${name}. ` +
             `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
