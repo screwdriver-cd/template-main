@@ -93,6 +93,38 @@ function publishTemplate(config) {
 }
 
 /**
+ * Removes all versions of a template by sending a delete request to the SDAPI /templates/{name} endpoint
+ * @method removeTemplate
+ * @param  {String}        name         The template name
+ * @return {Promise}       Resolves if removed successfully
+ */
+function removeTemplate(name) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
+    const url = URL.resolve(hostname, `templates/${templateName}`);
+
+    return request({
+        method: 'DELETE',
+        url,
+        auth: {
+            bearer: process.env.SD_TOKEN
+        },
+        json: true,
+        resolveWithFullResponse: true,
+        simple: false
+    }).then((response) => {
+        const { body } = response;
+
+        if (response.statusCode !== 204) {
+            throw new Error(`Error removing template ${name}. ` +
+            `${response.statusCode} (${body.error}): ${body.message}`);
+        }
+
+        return { name };
+    });
+}
+
+/**
  * Tags a specific template version by posting to the SDAPI /templates/templateName/tag endpoint
  * @method tagTemplate
  * @param  {Object}    config
@@ -139,5 +171,6 @@ module.exports = {
     loadYaml,
     validateTemplate,
     publishTemplate,
+    removeTemplate,
     tagTemplate
 };

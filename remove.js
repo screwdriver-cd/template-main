@@ -10,16 +10,6 @@ const opts = nomnom
         abbr: 'n',
         help: 'Template name'
     })
-    .option('tag', {
-        abbr: 't',
-        required: true,
-        help: 'Tag name'
-    })
-    .option('version', {
-        abbr: 'v',
-        required: true,
-        help: 'Tag version'
-    })
     .option('json', {
         abbr: 'j',
         flag: true,
@@ -27,16 +17,10 @@ const opts = nomnom
     })
     .parse();
 
-return index.tagTemplate({
-    name: opts.name,
-    tag: opts.tag,
-    version: opts.version
-})
+return index.removeTemplate(opts.name)
     .then((result) => {
         if (!opts.json) {
-            console.log(
-                `Template ${result.name}@${result.version} was successfully tagged as ${result.tag}`
-            );
+            console.log(`Template ${result.name} was successfully removed`);
         } else {
             console.log(JSON.stringify(result));
         }

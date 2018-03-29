@@ -74,8 +74,8 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     assert.equal(err.message, 'error');
                 });
         });
@@ -96,12 +96,14 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.validateTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    // eslint-disable-next-line max-len
                     assert.equal(err.message, 'Template is not valid for the following reasons:\n' +
-                    '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
-                    '\n    "type": "any.required",' +
-                    '\n    "context": {\n        "key": "steps"\n    }\n},');
+                        // eslint-disable-next-line max-len
+                        '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
+                        '\n    "type": "any.required",' +
+                        '\n    "context": {\n        "key": "steps"\n    }\n},');
                 });
         });
 
@@ -125,8 +127,8 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     assert.equal(err.message, 'error');
                 });
         });
@@ -144,8 +146,8 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.publishTemplate(templateConfig)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     assert.equal(err.message,
                         'Error publishing template. 403 (Forbidden): Fake forbidden message');
                 });
@@ -167,7 +169,53 @@ describe('index', () => {
         });
     });
 
+    describe('Template Remove', () => {
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
+
+            return index.removeTemplate(templateConfig.name)
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    assert.equal(err.message, 'error');
+                });
+        });
+
+        it('throws error for the corresponding request error status code if not 204', () => {
+            const responseFake = {
+                statusCode: 403,
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.removeTemplate(templateConfig.name)
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
+                    // eslint-disable-next-line max-len
+                    const msg = 'Error removing template template/test. 403 (Forbidden): Fake forbidden message';
+
+                    assert.equal(err.message, msg);
+                });
+        });
+
+        it('succeeds and does not throw an error if request status code is 204', () => {
+            const responseFake = {
+                statusCode: 204
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.removeTemplate(templateConfig.name)
+                .then(result => assert.deepEqual(result, { name: templateConfig.name }));
+        });
+    });
     describe('Template Tag', () => {
+        const url = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}` +
+            'templates/template%2Ftest/tags/stable';
         const config = {
             name: 'template/test',
             tag: 'stable',
@@ -178,8 +226,8 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     assert.equal(err.message, 'error');
                 });
         });
@@ -197,8 +245,8 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'),
-                (err) => {
+                .then(() => assert.fail('should not get here'))
+                .catch((err) => {
                     assert.equal(err.message,
                         'Error tagging template. 403 (Forbidden): Fake forbidden message');
                 });
@@ -221,7 +269,7 @@ describe('index', () => {
                     });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
-                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
+                        url,
                         auth: {
                             bearer: process.env.SD_TOKEN
                         },
@@ -252,7 +300,7 @@ describe('index', () => {
                     });
                     assert.calledWith(requestMock, {
                         method: 'PUT',
-                        url: 'https://api.screwdriver.cd/v4/templates/template%2Ftest/tags/stable',
+                        url,
                         auth: {
                             bearer: process.env.SD_TOKEN
                         },
