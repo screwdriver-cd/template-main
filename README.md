@@ -19,7 +19,7 @@ Example `screwdriver.yaml`:
 shared:
     image: node:6
 jobs:
-    main:  
+    main:
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate
@@ -45,7 +45,7 @@ shared:
     image: node:6
 jobs:
     # the main job is run in pull requests as well
-    main:  
+    main:
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate
@@ -62,6 +62,30 @@ $ ./node_modules/.bin/template-publish --json
 {name:"template/foo",version:"1.2.3"}
 ```
 
+### Removing a template
+
+To remove a template, run the `template-remove` script. You'll need to add an argument for the template name. Removing a template will remove _all_ of its versions.
+
+Example `screwdriver.yaml` with template removal:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    # the main job is run in pull requests as well
+    main:
+        steps:
+            - install: npm install screwdriver-template-main
+            - remove: ./node_modules/.bin/template-remove --name templateName
+```
+
+`template-remove` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-remove --json --name templateName
+{"name":"templateName"}
+```
+
 ### Tagging a template
 
 Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, tag, and version. The version must be an exact version, not just a major or major.minor one.
@@ -73,7 +97,7 @@ shared:
     image: node:6
 jobs:
     # the main job is run in pull requests as well
-    main:  
+    main:
         steps:
             - install: npm install screwdriver-template-main
             - validate: ./node_modules/.bin/template-validate

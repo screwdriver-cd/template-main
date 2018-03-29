@@ -167,6 +167,48 @@ describe('index', () => {
         });
     });
 
+    describe('Template Remove', () => {
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
+
+            return index.removeTemplate(templateConfig.name)
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message, 'error');
+                });
+        });
+
+        it('throws error for the corresponding request error status code if not 204', () => {
+            const responseFake = {
+                statusCode: 403,
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.removeTemplate(templateConfig.name)
+                .then(() => assert.fail('should not get here'),
+                (err) => {
+                    assert.equal(err.message,
+                        'Error removing template. 403 (Forbidden): Fake forbidden message');
+                });
+        });
+
+        it('succeeds and does not throw an error if request status code is 204', () => {
+            const responseFake = {
+                statusCode: 204
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.removeTemplate(templateConfig.name)
+                .then(result => assert.deepEqual(result, { name: templateConfig.name }));
+        });
+    });
     describe('Template Tag', () => {
         const config = {
             name: 'template/test',

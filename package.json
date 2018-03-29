@@ -11,6 +11,7 @@
   "bin": {
     "template-publish": "./publish.js",
     "template-validate": "./validate.js",
+    "template-remove": "./remove.js",
     "template-tag": "./tag.js"
   },
   "repository": {
@@ -32,6 +33,7 @@
     "Jerry Zhang <thejerryzhang@gmail.com>",
     "Min Zhang <minzhang@andrew.cmu.edu>",
     "Peter Peterson <jedipetey@gmail.com>",
+    "Philip Scott <pscott@zeptohost.com>",
     "Reetika Rastogi <r3rastogi@gmail.com>",
     "St. John Johnson <st.john.johnson@gmail.com>",
     "Tiffany Kyi <tiffanykyi@gmail.com>"
@@ -40,6 +42,7 @@
     "chai": "^3.5.0",
     "eslint": "^3.9.1",
     "eslint-config-screwdriver": "^2.0.9",
+    "eslint-plugin-import": "^2.9.0",
     "jenkins-mocha": "^3.0.0",
     "mockery": "^2.0.0",
     "sinon": "^2.1.0"
