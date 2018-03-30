@@ -349,7 +349,7 @@ describe('index', () => {
                     .then(() => assert.fail('should not get here'))
                     .catch((err) => {
                         assert.equal(err.message,
-                            'Error removing template. 403 (Forbidden): Fake forbidden message');
+                            'Error removing template tag. 403 (Forbidden): Fake forbidden message');
                     });
             });
 

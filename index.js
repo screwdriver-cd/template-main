@@ -191,11 +191,11 @@ function removeTag({ name, tag }) {
         resolveWithFullResponse: true,
         simple: false
     }).then((response) => {
-        const { body } = response;
+        const { body, statusCode } = response;
 
-        if (response.statusCode !== 204) {
-            throw new Error('Error removing template. ' +
-            `${response.statusCode} (${body.error}): ${body.message}`);
+        if (statusCode !== 204) {
+            throw new Error('Error removing template tag. ' +
+            `${statusCode} (${body.error}): ${body.message}`);
         }
 
         return {
