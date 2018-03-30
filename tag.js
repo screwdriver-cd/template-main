@@ -25,25 +25,20 @@ const opts = nomnom
         flag: true,
         help: 'Output result as json'
     })
-    .option('delete', {
-        abbr: 'd',
-        flag: true,
-        help: 'Deletes a template tag'
-    })
     .parse();
-const { name, tag, version } = opts;
 
-(opts.delete
-    ? index.removeTag({ name, tag })
-    : index.tagTemplate({ name, tag, version }))
+return index.tagTemplate({
+    name: opts.name,
+    tag: opts.tag,
+    version: opts.version
+})
     .then((result) => {
-        if (opts.json) {
-            console.log(JSON.stringify(result));
-        } else if (opts.delete) {
-            console.log(`Tag ${tag} was successfully removed from ${name}`);
+        if (!opts.json) {
+            console.log(
+                `Template ${result.name}@${result.version} was successfully tagged as ${result.tag}`
+            );
         } else {
-            // version could be undefined if user wants to tag latest template
-            console.log(`Template ${name}@${result.version} was successfully tagged as ${tag}`);
+            console.log(JSON.stringify(result));
         }
     })
     .catch((err) => {
