@@ -12,7 +12,9 @@
     "template-publish": "./publish.js",
     "template-validate": "./validate.js",
     "template-remove": "./remove.js",
-    "template-tag": "./tag.js"
+    "template-tag": "./tagPublish.js",
+    "tag-publish": "./tagPublish.js",
+    "tag-remove": "./tagRemove.js"
   },
   "repository": {
     "type": "git",
