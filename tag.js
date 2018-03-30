@@ -34,8 +34,9 @@ return index.tagTemplate({
 })
     .then((result) => {
         if (!opts.json) {
-            // eslint-disable-next-line max-len
-            console.log(`Template ${opts.name}@${opts.version} was successfully tagged as ${opts.tag}`);
+            console.log(
+                `Template ${result.name}@${result.version} was successfully tagged as ${result.tag}`
+            );
         } else {
             console.log(JSON.stringify(result));
         }
