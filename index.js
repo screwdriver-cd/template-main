@@ -127,11 +127,12 @@ function removeTemplate(name) {
 /**
  * Helper function that returns the latest version for a template
  * @method getLatestVersion
- * @param  {String}         templateName          The name of the template
+ * @param  {String}         name        Template name
  * @return {Promise}        Resolves to latest version
  */
-function getLatestVersion(templateName) {
+function getLatestVersion(name) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
     const url = URL.resolve(hostname, `templates/${templateName}`);
 
     return request({
