@@ -17,7 +17,7 @@ const opts = nomnom
     })
     .option('version', {
         abbr: 'v',
-        required: false,
+        required: true,
         help: 'Tag version'
     })
     .option('json', {
@@ -42,8 +42,7 @@ const { name, tag, version } = opts;
         } else if (opts.delete) {
             console.log(`Tag ${tag} was successfully removed from ${name}`);
         } else {
-            // version could be undefined if user wants to tag latest template
-            console.log(`Template ${name}@${result.version} was successfully tagged as ${tag}`);
+            console.log(`Template ${name}@${version} was successfully tagged as ${tag}`);
         }
     })
     .catch((err) => {

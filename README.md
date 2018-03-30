@@ -103,7 +103,7 @@ $ ./node_modules/.bin/template-remove --json --name templateName
 
 ### Tagging a template
 
-Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag. You can optionally specify a version; the version must be an exact version, not just a major or major.minor one. If omitted, the latest version will be tagged.
+Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, version, and tag. The version must be an exact version, not just a major or major.minor one.
 
 Example `screwdriver.yaml` with validation and publishing and tagging:
 
@@ -151,7 +151,7 @@ jobs:
         requires: main
         steps:
             - publish: ./node_modules/.bin/template-publish
-            - tag: ./node_modules/.bin/template-tag --name templateName --tag latest
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.0.0 --tag latest
     detached_remove_tag:
         steps:
             - remove: ./node_modules/.bin/template-tag --delete --name templateName --tag latest
