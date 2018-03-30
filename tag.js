@@ -27,17 +27,17 @@ const opts = nomnom
     })
     .parse();
 
-index.tagTemplate({
+return index.tagTemplate({
     name: opts.name,
     tag: opts.tag,
     version: opts.version
 })
     .then((result) => {
-        if (opts.json) {
-            console.log(JSON.stringify(result));
-        } else {
+        if (!opts.json) {
             // eslint-disable-next-line max-len
             console.log(`Template ${opts.name}@${opts.version} was successfully tagged as ${opts.tag}`);
+        } else {
+            console.log(JSON.stringify(result));
         }
     })
     .catch((err) => {

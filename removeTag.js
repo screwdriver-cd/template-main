@@ -22,15 +22,15 @@ const opts = nomnom
     })
     .parse();
 
-index.removeTag({
+return index.removeTag({
     name: opts.name,
     tag: opts.tag
 })
     .then((result) => {
-        if (opts.json) {
-            console.log(JSON.stringify(result));
-        } else {
+        if (!opts.json) {
             console.log(`Tag ${opts.tag} was successfully removed from ${opts.name}`);
+        } else {
+            console.log(JSON.stringify(result));
         }
     })
     .catch((err) => {
