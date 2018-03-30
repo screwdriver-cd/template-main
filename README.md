@@ -103,9 +103,7 @@ $ ./node_modules/.bin/template-remove --json --name templateName
 
 ### Tagging a template
 
-_Note: `template-tag` is now deprecated, but still supported. Use `tag-publish` instead._
-
-Optionally, tag a template using the `tag-publish` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, version, and tag. The version must be an exact version, not just a major or major.minor one.
+Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, version, and tag. The version must be an exact version, not just a major or major.minor one.
 
 Example `screwdriver.yaml` with validation and publishing and tagging:
 
@@ -123,20 +121,20 @@ jobs:
         steps:
             - install: npm install screwdriver-template-main
             - publish: ./node_modules/.bin/template-publish
-            - tag: ./node_modules/.bin/tag-publish --name templateName --version 1.2.3 --tag stable
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.2.3 --tag stable
 ```
 
-`tag-publish` can print a result as json by passing `--json` option to the command.
+`template-tag` can print a result as json by passing `--json` option to the command.
 
 ```
-$ ./node_modules/.bin/tag-publish --json --name templateName --version 1.2.3 --tag stable
+$ ./node_modules/.bin/template-tag --json --name templateName --version 1.2.3 --tag stable
 {"name":"templateName","tag":"stable","version":"1.2.3"}
 ```
 
 ### Removing a template tag
 
 
-To remove a template tag, run the `tag-remove` binary. This must be done in the same pipeline that published the template. You'll need to specify the template name and tag as arguments.
+To remove a template tag, run the `template-remove-tag` binary. This must be done in the same pipeline that published the template. You'll need to specify the template name and tag as arguments.
 
 Example `screwdriver.yaml` with validation, publishing and tagging, and tag removal as a detached job:
 
@@ -154,10 +152,17 @@ jobs:
         requires: main
         steps:
             - publish: ./node_modules/.bin/template-publish
-            - tag: ./node_modules/.bin/tag-publish --name templateName --version 1.0.0 --tag latest
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.0.0 --tag latest
     detached_remove_tag:
         steps:
-            - remove: ./node_modules/.bin/tag-remove --name templateName --tag latest
+            - remove: ./node_modules/.bin/template-remove-tag --name templateName --tag latest
+```
+
+`template-remove-tag` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-remove-tag --json --name templateName --tag stable
+{"name":"templateName","tag":"stable"}
 ```
 
 ## Testing
