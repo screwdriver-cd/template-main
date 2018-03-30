@@ -144,7 +144,7 @@ function getLatestVersion(name) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then(versions => versions[0]);
+    }).then(versions => versions[0].version);
 }
 
 /**
