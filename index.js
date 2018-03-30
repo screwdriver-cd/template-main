@@ -144,7 +144,16 @@ function getLatestVersion(name) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then(versions => versions[0].version);
+    }).then((response) => {
+        const { body, statusCode } = response;
+
+        if (statusCode !== 200) {
+            throw new Error('Error getting latest template version. ' +
+                `${statusCode} (${body.error}): ${body.message}`);
+        }
+
+        return body[0].version;
+    });
 }
 
 /**
@@ -180,11 +189,11 @@ function tagTemplate({ name, tag, version }) {
         resolveWithFullResponse: true,
         simple: false
     }).then((response) => {
-        const body = response.body;
+        const { body, statusCode } = response;
 
-        if (response.statusCode !== 201 && response.statusCode !== 200) {
+        if (statusCode !== 201 && statusCode !== 200) {
             throw new Error('Error tagging template. ' +
-            `${response.statusCode} (${body.error}): ${body.message}`);
+            `${statusCode} (${body.error}): ${body.message}`);
         }
 
         return {

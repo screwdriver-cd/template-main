@@ -290,32 +290,36 @@ describe('index', () => {
                     name: config.name,
                     tag: config.tag
                 };
-                const responseFake = {
+                const versionsResponseFake = {
+                    statusCode: 200,
+                    body: [{
+                        id: 23,
+                        labels: [],
+                        config: {
+                            image: 'node:6',
+                            steps: [
+                                {
+                                    echo: 'echo $FOO'
+                                }
+                            ],
+                            environment: {
+                                FOO: 'bar'
+                            }
+                        },
+                        name: 'tifftemplate',
+                        version: '1.0.0',
+                        description: 'test',
+                        maintainer: 'foo@bar.com',
+                        pipelineId: 113
+                    }]
+                };
+                const resultResponseFake = {
                     statusCode: 201,
                     body: templateConfig
                 };
 
-                requestMock.onFirstCall().resolves([{
-                    id: 23,
-                    labels: [],
-                    config: {
-                        image: 'node:6',
-                        steps: [
-                            {
-                                echo: 'echo $FOO'
-                            }
-                        ],
-                        environment: {
-                            FOO: 'bar'
-                        }
-                    },
-                    name: 'tifftemplate',
-                    version: '1.0.0',
-                    description: 'test',
-                    maintainer: 'foo@bar.com',
-                    pipelineId: 113
-                }]);
-                requestMock.onSecondCall().resolves(responseFake);
+                requestMock.onFirstCall().resolves(versionsResponseFake);
+                requestMock.onSecondCall().resolves(resultResponseFake);
 
                 return index.tagTemplate(versionlessConfig)
                     .then((result) => {
@@ -337,6 +341,29 @@ describe('index', () => {
                             resolveWithFullResponse: true,
                             simple: false
                         });
+                    });
+            });
+
+            it('throws an error when getting latest template versions doesn\'t yield 200', () => {
+                const versionlessConfig = {
+                    name: config.name,
+                    tag: config.tag
+                };
+                const versionsResponseFake = {
+                    statusCode: 404,
+                    body: {
+                        error: 'Not Found',
+                        message: 'Some 404 message'
+                    }
+                };
+
+                requestMock.resolves(versionsResponseFake);
+
+                return index.tagTemplate(versionlessConfig)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message, 'Error getting latest template version. ' +
+                            '404 (Not Found): Some 404 message');
                     });
             });
 
