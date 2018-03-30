@@ -285,7 +285,7 @@ describe('index', () => {
                     });
             });
 
-            it('suceeds when no version number is provided', () => {
+            it('succeeds when no version number is provided', () => {
                 const versionlessConfig = {
                     name: config.name,
                     tag: config.tag
