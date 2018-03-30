@@ -216,102 +216,169 @@ describe('index', () => {
     describe('Template Tag', () => {
         const url = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}` +
             'templates/template%2Ftest/tags/stable';
-        const config = {
-            name: 'template/test',
-            tag: 'stable',
-            version: '1.0.0'
-        };
 
-        it('throws error when request yields an error', () => {
-            requestMock.rejects(new Error('error'));
+        describe('Create/Update a tag', () => {
+            const config = {
+                name: 'template/test',
+                tag: 'stable',
+                version: '1.0.0'
+            };
 
-            return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'))
-                .catch((err) => {
-                    assert.equal(err.message, 'error');
-                });
-        });
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
 
-        it('throws error for the corresponding request error status code if not 201', () => {
-            const responseFake = {
-                statusCode: 403,
-                body: {
+                return index.tagTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('throws error for the corresponding request error status code if not 201', () => {
+                const responseFake = {
                     statusCode: 403,
-                    error: 'Forbidden',
-                    message: 'Fake forbidden message'
-                }
-            };
+                    body: {
+                        statusCode: 403,
+                        error: 'Forbidden',
+                        message: 'Fake forbidden message'
+                    }
+                };
 
-            requestMock.resolves(responseFake);
+                requestMock.resolves(responseFake);
 
-            return index.tagTemplate(config)
-                .then(() => assert.fail('should not get here'))
-                .catch((err) => {
-                    assert.equal(err.message,
-                        'Error tagging template. 403 (Forbidden): Fake forbidden message');
-                });
+                return index.tagTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message,
+                            'Error tagging template. 403 (Forbidden): Fake forbidden message');
+                    });
+            });
+
+            it('succeeds and does not throw an error if request status code is 201', () => {
+                const responseFake = {
+                    statusCode: 201,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.tagTemplate(config)
+                    .then((result) => {
+                        assert.deepEqual(result, {
+                            name: config.name,
+                            tag: config.tag,
+                            version: config.version
+                        });
+                        assert.calledWith(requestMock, {
+                            method: 'PUT',
+                            url,
+                            auth: {
+                                bearer: process.env.SD_TOKEN
+                            },
+                            json: true,
+                            body: {
+                                version: '1.0.0'
+                            },
+                            resolveWithFullResponse: true,
+                            simple: false
+                        });
+                    });
+            });
+
+            it('succeeds and does not throw an error if request status code is 200', () => {
+                const responseFake = {
+                    statusCode: 200,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.tagTemplate(config)
+                    .then((result) => {
+                        assert.deepEqual(result, {
+                            name: config.name,
+                            version: config.version,
+                            tag: config.tag
+                        });
+                        assert.calledWith(requestMock, {
+                            method: 'PUT',
+                            url,
+                            auth: {
+                                bearer: process.env.SD_TOKEN
+                            },
+                            json: true,
+                            body: {
+                                version: '1.0.0'
+                            },
+                            resolveWithFullResponse: true,
+                            simple: false
+                        });
+                    });
+            });
         });
 
-        it('succeeds and does not throw an error if request status code is 201', () => {
-            const responseFake = {
-                statusCode: 201,
-                body: templateConfig
+        describe('Delete a tag', () => {
+            const config = {
+                name: 'template/test',
+                tag: 'stable'
             };
 
-            requestMock.resolves(responseFake);
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
 
-            return index.tagTemplate(config)
-                .then((result) => {
-                    assert.deepEqual(result, {
-                        name: config.name,
-                        tag: config.tag,
-                        version: config.version
+                return index.removeTag(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message, 'error');
                     });
-                    assert.calledWith(requestMock, {
-                        method: 'PUT',
-                        url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
-                        },
-                        json: true,
-                        body: {
-                            version: '1.0.0'
-                        },
-                        resolveWithFullResponse: true,
-                        simple: false
-                    });
-                });
-        });
+            });
 
-        it('succeeds and does not throw an error if request status code is 200', () => {
-            const responseFake = {
-                statusCode: 200,
-                body: templateConfig
-            };
+            it('throws error for the corresponding request error status code if not 204', () => {
+                const responseFake = {
+                    statusCode: 403,
+                    body: {
+                        statusCode: 403,
+                        error: 'Forbidden',
+                        message: 'Fake forbidden message'
+                    }
+                };
 
-            requestMock.resolves(responseFake);
+                requestMock.resolves(responseFake);
 
-            return index.tagTemplate(config)
-                .then((result) => {
-                    assert.deepEqual(result, {
-                        name: config.name,
-                        version: config.version,
-                        tag: config.tag
+                return index.removeTag(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message,
+                            'Error removing template tag. 403 (Forbidden): Fake forbidden message');
                     });
-                    assert.calledWith(requestMock, {
-                        method: 'PUT',
-                        url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
-                        },
-                        json: true,
-                        body: {
-                            version: '1.0.0'
-                        },
-                        resolveWithFullResponse: true,
-                        simple: false
+            });
+
+            it('succeeds and does not throw an error if request status code is 204', () => {
+                const responseFake = {
+                    statusCode: 204,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.removeTag(config)
+                    .then((result) => {
+                        assert.deepEqual(result, {
+                            name: config.name,
+                            tag: config.tag
+                        });
+                        assert.calledWith(requestMock, {
+                            method: 'DELETE',
+                            url,
+                            auth: {
+                                bearer: process.env.SD_TOKEN
+                            },
+                            json: true,
+                            resolveWithFullResponse: true,
+                            simple: false
+                        });
                     });
-                });
+            });
         });
     });
 });

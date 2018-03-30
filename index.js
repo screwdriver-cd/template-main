@@ -58,7 +58,7 @@ function validateTemplate(config) {
 /**
  * Publishes the template yaml by posting to the SDAPI /templates endpoint
  * @method publishTemplate
- * @param   {Object}        config          Template config
+ * @param  {Object}         config          Template config
  * @return {Promise}        Resolves if publish successfully
  */
 function publishTemplate(config) {
@@ -125,13 +125,13 @@ function removeTemplate(name) {
 }
 
 /**
- * Tags a specific template version by posting to the SDAPI /templates/templateName/tag endpoint
+ * Tags a specific template version by posting to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
  * @method tagTemplate
  * @param  {Object}    config
- * @param  {String}    config.name    Template name
- * @param  {String}    config.tag     Template tag
- * @param  {String}    config.version Template version
- * @return {Promise}                  Resolves if tagged successfully
+ * @param  {String}    config.name       Template name
+ * @param  {String}    config.tag        Template tag
+ * @param  {String}    config.version    Template version
+ * @return {Promise}                     Resolves if tagged successfully
  */
 function tagTemplate({ name, tag, version }) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
@@ -152,11 +152,11 @@ function tagTemplate({ name, tag, version }) {
         resolveWithFullResponse: true,
         simple: false
     }).then((response) => {
-        const body = response.body;
+        const { body, statusCode } = response;
 
-        if (response.statusCode !== 201 && response.statusCode !== 200) {
+        if (statusCode !== 201 && statusCode !== 200) {
             throw new Error('Error tagging template. ' +
-            `${response.statusCode} (${body.error}): ${body.message}`);
+            `${statusCode} (${body.error}): ${body.message}`);
         }
 
         return {
@@ -167,10 +167,48 @@ function tagTemplate({ name, tag, version }) {
     });
 }
 
+/**
+ * Removes a template tag by sending a delete request to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
+ * @method removeTag
+ * @param  {Object}    config
+ * @param  {String}    config.name    Template name
+ * @param  {String}    config.tag     Template tag
+ * @return {Promise}                  Resolves if tagged successfully
+ */
+function removeTag({ name, tag }) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
+    const templateTag = encodeURIComponent(tag);
+    const url = URL.resolve(hostname, `templates/${templateName}/tags/${templateTag}`);
+
+    return request({
+        method: 'DELETE',
+        url,
+        auth: {
+            bearer: process.env.SD_TOKEN
+        },
+        json: true,
+        resolveWithFullResponse: true,
+        simple: false
+    }).then((response) => {
+        const { body, statusCode } = response;
+
+        if (statusCode !== 204) {
+            throw new Error('Error removing template tag. ' +
+            `${statusCode} (${body.error}): ${body.message}`);
+        }
+
+        return {
+            name,
+            tag
+        };
+    });
+}
 module.exports = {
     loadYaml,
     validateTemplate,
     publishTemplate,
     removeTemplate,
-    tagTemplate
+    tagTemplate,
+    removeTag
 };
