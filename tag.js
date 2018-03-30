@@ -38,19 +38,11 @@ const { name, tag, version } = opts;
     : index.tagTemplate({ name, tag, version }))
     .then((result) => {
         if (opts.json) {
-            return result;
-        }
-        if (opts.delete) {
-            return `Tag ${tag} was successfully removed from ${name}`;
-        }
-
-        return `Template ${name}@${version} was successfully tagged as ${tag}`;
-    })
-    .then((output) => {
-        if (typeof output === 'object') {
-            console.log(JSON.stringify(output));
+            console.log(JSON.stringify(result));
+        } else if (opts.delete) {
+            console.log(`Tag ${tag} was successfully removed from ${name}`);
         } else {
-            console.log(output);
+            console.log(`Template ${name}@${version} was successfully tagged as ${tag}`);
         }
     })
     .catch((err) => {
