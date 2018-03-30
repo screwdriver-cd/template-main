@@ -127,7 +127,7 @@ jobs:
 `template-tag` can print a result as json by passing `--json` option to the command.
 
 ```
-$ ./node_modules/.bin/template-publish --json --name templateName --version 1.2.3 --tag stable
+$ ./node_modules/.bin/template-tag --json --name templateName --version 1.2.3 --tag stable
 {"name":"templateName","tag":"stable","version":"1.2.3"}
 ```
 
