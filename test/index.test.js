@@ -295,7 +295,26 @@ describe('index', () => {
                     body: templateConfig
                 };
 
-                requestMock.onFirstCall().resolves(['1.0.0']);
+                requestMock.onFirstCall().resolves([{
+                    id: 23,
+                    labels: [],
+                    config: {
+                        image: 'node:6',
+                        steps: [
+                            {
+                                echo: 'echo $FOO'
+                            }
+                        ],
+                        environment: {
+                            FOO: 'bar'
+                        }
+                    },
+                    name: 'tifftemplate',
+                    version: '1.0.0',
+                    description: 'test',
+                    maintainer: 'foo@bar.com',
+                    pipelineId: 113
+                }]);
                 requestMock.onSecondCall().resolves(responseFake);
 
                 return index.tagTemplate(versionlessConfig)
