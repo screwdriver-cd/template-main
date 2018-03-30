@@ -9,6 +9,10 @@
 npm install screwdriver-template-main
 ```
 
+Create a Screwdriver pipeline with your template repo and start the build to validate and publish it.
+
+To update a Screwdriver template, make changes in your SCM repository and rerun the pipeline build.
+
 ### Validating a template
 
 Run the `template-validate` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
@@ -99,7 +103,7 @@ $ ./node_modules/.bin/template-remove --json --name templateName
 
 ### Tagging a template
 
-Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name, tag, and version. The version must be an exact version, not just a major or major.minor one.
+Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag. You can optionally specify a version; the version must be an exact version, not just a major or major.minor one. If omitted, the latest version will be tagged.
 
 Example `screwdriver.yaml` with validation and publishing and tagging:
 
@@ -120,15 +124,37 @@ jobs:
             - tag: ./node_modules/.bin/template-tag --name templateName --version 1.2.3 --tag stable
 ```
 
-Create a Screwdriver pipeline with your template repo and start the build to validate and publish it.
-
-To update a Screwdriver template, make changes in your SCM repository and rerun the pipeline build.
-
-`template-validate` can print a result as json by passing `--json` option to the command.
+`template-tag` can print a result as json by passing `--json` option to the command.
 
 ```
 $ ./node_modules/.bin/template-publish --json --name templateName --version 1.2.3 --tag stable
 {"name":"templateName","tag":"stable","version":"1.2.3"}
+```
+
+##### Removing a template tag
+
+Adding the `--delete` or `-d` flag to the `template-tag` script will delete a template. This must be done in the same pipeline that published the template. You'll need to specify the template name and tag as arguments.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and tag removal as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/template-publish
+            - tag: ./node_modules/.bin/template-tag --name templateName --tag latest
+    detached_remove_tag:
+        steps:
+            - remove: ./node_modules/.bin/template-tag --delete --name templateName --tag latest
 ```
 
 ## Testing
