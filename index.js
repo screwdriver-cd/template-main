@@ -127,7 +127,7 @@ function removeTemplate(name) {
 /**
  * Helper function that returns the latest version for a template
  * @method getLatestVersion
- * @param  {Object}         config          Template config
+ * @param  {String}         templateName          The name of the template
  * @return {Promise}        Resolves to latest version
  */
 function getLatestVersion(templateName) {
