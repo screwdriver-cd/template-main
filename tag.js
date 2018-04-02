@@ -17,7 +17,7 @@ const opts = nomnom
     })
     .option('version', {
         abbr: 'v',
-        required: true,
+        required: false,
         help: 'Tag version'
     })
     .option('json', {
