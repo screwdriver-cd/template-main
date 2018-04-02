@@ -1,15 +1,14 @@
-workflow:
-    - publish
-
 shared:
     image: node:6
 
 jobs:
     main:
+        requires: [~pr, ~commit]
         steps:
             - install: npm install
             - test: npm test
     publish:
+        requires: main
         template: screwdriver-cd/semantic-release@1.0.2
         secrets:
             # Publishing to NPM
