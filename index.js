@@ -157,6 +157,40 @@ function getLatestVersion(name) {
 }
 
 /**
+ * Helper function that returns the version from a tag
+ * @method getVersionFromTag
+ * @param  {String}         name        Template name
+ * @param  {String}         tag         Tag to fetch version from
+ * @return {Promise}        Resolves the version from given tag
+ */
+function getVersionFromTag({ name, tag }) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
+    const templateTag = encodeURIComponent(tag);
+    const url = URL.resolve(hostname, `templates/${templateName}/${templateTag}`);
+
+    return request({
+        method: 'GET',
+        url,
+        auth: {
+            bearer: process.env.SD_TOKEN
+        },
+        json: true,
+        resolveWithFullResponse: true,
+        simple: false
+    }).then((response) => {
+        const { body, statusCode } = response;
+
+        if (statusCode !== 200) {
+            throw new Error('Error getting version from tag. ' +
+                `${statusCode} (${body.error}): ${body.message}`);
+        }
+
+        return body.version;
+    });
+}
+
+/**
  * Tags a specific template version by posting to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
  * @method tagTemplate
  * @param  {Object}    config
@@ -247,5 +281,6 @@ module.exports = {
     publishTemplate,
     removeTemplate,
     tagTemplate,
-    removeTag
+    removeTag,
+    getVersionFromTag
 };

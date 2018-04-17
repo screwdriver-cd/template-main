@@ -399,6 +399,50 @@ describe('index', () => {
             });
         });
 
+        describe('Get version from a tag', () => {
+            const config = {
+                name: 'template/test',
+                tag: 'stable'
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index.getVersionFromTag(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch((err) => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('succeeds and does not throw an error if request status code is 200', () => {
+                const versionUrl = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}`
+                    + 'templates/template%2Ftest/stable';
+
+                const responseFake = {
+                    statusCode: 200,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.getVersionFromTag(config)
+                    .then((result) => {
+                        assert.deepEqual(result, templateConfig.version);
+                        assert.calledWith(requestMock, {
+                            method: 'GET',
+                            url: versionUrl,
+                            auth: {
+                                bearer: process.env.SD_TOKEN
+                            },
+                            json: true,
+                            resolveWithFullResponse: true,
+                            simple: false
+                        });
+                    });
+            });
+        });
+
         describe('Delete a tag', () => {
             const config = {
                 name: 'template/test',
