@@ -13,7 +13,8 @@
     "template-validate": "./validate.js",
     "template-remove": "./remove.js",
     "template-tag": "./tag.js",
-    "template-remove-tag": "./removeTag.js"
+    "template-remove-tag": "./removeTag.js",
+    "template-get-version-from-tag": "./getVersionFromTag.js"
   },
   "repository": {
     "type": "git",

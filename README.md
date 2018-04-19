@@ -165,6 +165,32 @@ $ ./node_modules/.bin/template-remove-tag --json --name templateName --tag stabl
 {"name":"templateName","tag":"stable"}
 ```
 
+## Getting the version from a template tag
+
+To get the version from a template tag, run the `template-get-version-from-tag` binary. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and getting a version as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/template-publish
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.0.0 --tag latest
+    detached_get_version_from_tag:
+        steps:
+            - get_version: ./node_modules/.bin/template-get-version-from-tag --name templateName --tag latest
+```
+
 ## Testing
 
 ```bash
