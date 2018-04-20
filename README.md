@@ -165,7 +165,7 @@ $ ./node_modules/.bin/template-remove-tag --json --name templateName --tag stabl
 {"name":"templateName","tag":"stable"}
 ```
 
-## Getting the version from a template tag
+### Getting the version from a template tag
 
 To get the version from a template tag, run the `template-get-version-from-tag` binary. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag.
 
