@@ -22,7 +22,7 @@ return index.getVersionFromTag({
     tag: opts.tag
 })
     .then((result) => {
-        console.log(`${opts.tag} tags ${opts.name}@${result.version}`);
+        console.log(`${result}`);
     })
     .catch((err) => {
         console.error(err);
