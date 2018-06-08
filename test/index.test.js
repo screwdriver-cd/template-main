@@ -167,6 +167,38 @@ describe('index', () => {
                     version: templateConfig.version
                 }));
         });
+
+        it('succeeds and does not throw an error given a name and namespace', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: templateConfig
+            };
+
+            templateConfig.namespace = 'meow';
+            requestMock.resolves(responseFake);
+
+            return index.publishTemplate(templateConfig)
+                .then(result => assert.deepEqual(result, {
+                    name: `${templateConfig.namespace}/${templateConfig.name}`,
+                    version: templateConfig.version
+                }));
+        });
+
+        it('succeeds and does not show namespace if namespace is default', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: templateConfig
+            };
+
+            templateConfig.namespace = 'default';
+            requestMock.resolves(responseFake);
+
+            return index.publishTemplate(templateConfig)
+                .then(result => assert.deepEqual(result, {
+                    name: templateConfig.name,
+                    version: templateConfig.version
+                }));
+        });
     });
 
     describe('Template Remove', () => {

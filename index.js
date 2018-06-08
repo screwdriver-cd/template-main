@@ -85,8 +85,15 @@ function publishTemplate(config) {
             `${response.statusCode} (${body.error}): ${body.message}`);
         }
 
+        let fullTemplateName = body.name;
+
+        // Figure out template name
+        if (body.namespace && body.namespace !== 'default') {
+            fullTemplateName = `${body.namespace}/${body.name}`;
+        }
+
         return {
-            name: body.name,
+            name: fullTemplateName,
             version: body.version
         };
     });
@@ -95,7 +102,7 @@ function publishTemplate(config) {
 /**
  * Removes all versions of a template by sending a delete request to the SDAPI /templates/{name} endpoint
  * @method removeTemplate
- * @param  {String}        name         The template name
+ * @param  {String}        name         The full template name
  * @return {Promise}       Resolves if removed successfully
  */
 function removeTemplate(name) {
