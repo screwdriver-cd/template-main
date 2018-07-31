@@ -11,13 +11,24 @@ const opts = nomnom
         flag: true,
         help: 'Output result as json'
     })
+    .option('tag', {
+        abbr: 't',
+        default: 'latest',
+        help: 'Add template tag'
+    })
     .parse();
 
 return index.loadYaml(path)
     .then(config => index.publishTemplate(config))
+    .then(publishResult => index.tagTemplate({
+        name: publishResult.name,
+        tag: opts.tag,
+        version: publishResult.version
+    }))
     .then((result) => {
         if (!opts.json) {
-            console.log(`Template ${result.name}@${result.version} was successfully published`);
+            console.log(`Template ${result.name}@${result.version} was `
+                + `successfully published and tagged as ${result.tag}`);
         } else {
             console.log(JSON.stringify(result));
         }
