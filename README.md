@@ -58,14 +58,14 @@ jobs:
         requires: main
         steps:
             - install: npm install screwdriver-template-main
-            - publish: ./node_modules/.bin/template-publish
+            - publish: ./node_modules/.bin/template-publish --tag stable
 ```
 
-`template-publish` can print a result as json by passing `--json` option to the command.
+`template-publish` can print a result as json by passing `--json` option to the command. `template-publish` will tag the published version as well. The default tag is `latest` if none is specified.
 
 ```
 $ ./node_modules/.bin/template-publish --json
-{name:"template/foo",version:"1.2.3"}
+{name:"template/foo",version:"1.2.3",tag:"stable"}
 ```
 
 ### Removing a template
