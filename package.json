@@ -41,17 +41,17 @@
     "Tiffany Kyi <tiffanykyi@gmail.com>"
   ],
   "devDependencies": {
-    "chai": "^3.5.0",
-    "eslint": "^4.6.0",
-    "eslint-config-screwdriver": "^3.0.0",
-    "jenkins-mocha": "^3.0.0",
+    "chai": "^4.2.0",
+    "eslint": "^4.19.0",
+    "eslint-config-screwdriver": "^3.0.1",
+    "jenkins-mocha": "^6.0.0",
     "mockery": "^2.0.0",
-    "sinon": "^2.1.0"
+    "sinon": "^7.1.0"
   },
   "dependencies": {
-    "js-yaml": "^3.12.0",
+    "js-yaml": "^3.12.1",
     "nomnom": "^1.8.1",
-    "request": "^2.87.0",
+    "request": "^2.88.0",
     "request-promise-native": "^1.0.5"
   },
   "release": {
