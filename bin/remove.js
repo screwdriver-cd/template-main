@@ -2,4 +2,4 @@
 
 'use strict';
 
-require('../commands').run('remove');
+require('../commands').run('remove_template');

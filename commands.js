@@ -119,7 +119,7 @@ const operations = {
         help: 'remove tag'
     },
 
-    /* remove a tamplte */
+    /* remove a template */
     remove_template: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
