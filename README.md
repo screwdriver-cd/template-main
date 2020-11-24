@@ -1,5 +1,5 @@
 # template-main
-[![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] [![Dependency Status][daviddm-image]][daviddm-url] ![License][license-image]
+[![Version][npm-image]][npm-url] ![Downloads][downloads-image] [![Build Status][status-image]][status-url] [![Open Issues][issues-image]][issues-url] ![License][license-image]
 
 > Validates and publishes templates
 
@@ -207,7 +207,5 @@ Code licensed under the BSD 3-Clause license. See LICENSE file for terms.
 [license-image]: https://img.shields.io/npm/l/screwdriver-template-main.svg
 [issues-image]: https://img.shields.io/github/issues/screwdriver-cd/template-main.svg
 [issues-url]: https://github.com/screwdriver-cd/template-main/issues
-[status-image]: https://cd.screwdriver.cd/pipelines/114/badge
-[status-url]: https://cd.screwdriver.cd/pipelines/114
-[daviddm-image]: https://david-dm.org/screwdriver-cd/template-main.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/screwdriver-cd/template-main
+[status-image]: https://cd.screwdriver.cd/pipelines/493/badge
+[status-url]: https://cd.screwdriver.cd/pipelines/493
