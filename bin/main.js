@@ -6,11 +6,12 @@
 // (similar to git with 'git branch', 'git status', etc)
 //
 // The other commands are kept around for backwards compatibility.
-const operations = require('../commands').operations;
 const nomnom = require('nomnom');
+const { operations } = require('../commands');
 
-Object.keys(operations).forEach((key) => {
-    nomnom.command(key)
+Object.keys(operations).forEach(key => {
+    nomnom
+        .command(key)
         .options(operations[key].opts)
         .callback(operations[key].exec)
         .help(operations[key].help);

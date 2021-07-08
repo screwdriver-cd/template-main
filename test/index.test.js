@@ -1,6 +1,6 @@
 'use strict';
 
-const assert = require('chai').assert;
+const { assert } = require('chai');
 const mockery = require('mockery');
 const sinon = require('sinon');
 
@@ -35,9 +35,7 @@ describe('index', () => {
             maintainer: 'foo@bar.com',
             config: {
                 image: 'node:6',
-                steps: [
-                    { publish: 'node ./test.js' }
-                ]
+                steps: [{ publish: 'node ./test.js' }]
             }
         };
 
@@ -73,37 +71,44 @@ describe('index', () => {
         it('throws error when request yields an error', () => {
             requestMock.rejects(new Error('error'));
 
-            return index.validateTemplate(templateConfig)
+            return index
+                .validateTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
+                .catch(err => {
                     assert.equal(err.message, 'error');
                 });
         });
 
         it('throws error if response template is invalid', () => {
             const responseFake = {
-                errors: [{
-                    message: '"steps" is required',
-                    path: 'config.steps',
-                    type: 'any.required',
-                    context: {
-                        key: 'steps'
+                errors: [
+                    {
+                        message: '"steps" is required',
+                        path: 'config.steps',
+                        type: 'any.required',
+                        context: {
+                            key: 'steps'
+                        }
                     }
-                }],
+                ],
                 template: {}
             };
 
             requestMock.resolves(responseFake);
 
-            return index.validateTemplate(templateConfig)
+            return index
+                .validateTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
+                .catch(err => {
                     // eslint-disable-next-line max-len
-                    assert.equal(err.message, 'Template is not valid for the following reasons:\n' +
-                        // eslint-disable-next-line max-len
-                        '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
-                        '\n    "type": "any.required",' +
-                        '\n    "context": {\n        "key": "steps"\n    }\n},');
+                    assert.equal(
+                        err.message,
+                        'Template is not valid for the following reasons:\n' +
+                            // eslint-disable-next-line max-len
+                            '{\n    "message": "\\"steps\\" is required",\n    "path": "config.steps",' +
+                            '\n    "type": "any.required",' +
+                            '\n    "context": {\n        "key": "steps"\n    }\n},'
+                    );
                 });
         });
 
@@ -115,10 +120,11 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.validateTemplate(templateConfig)
-                .then(result => assert.deepEqual(result, {
+            return index.validateTemplate(templateConfig).then(result =>
+                assert.deepEqual(result, {
                     valid: true
-                }));
+                })
+            );
         });
     });
 
@@ -126,9 +132,10 @@ describe('index', () => {
         it('throws error when request yields an error', () => {
             requestMock.rejects(new Error('error'));
 
-            return index.publishTemplate(templateConfig)
+            return index
+                .publishTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
+                .catch(err => {
                     assert.equal(err.message, 'error');
                 });
         });
@@ -145,11 +152,11 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig)
+            return index
+                .publishTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
-                    assert.equal(err.message,
-                        'Error publishing template. 403 (Forbidden): Fake forbidden message');
+                .catch(err => {
+                    assert.equal(err.message, 'Error publishing template. 403 (Forbidden): Fake forbidden message');
                 });
         });
 
@@ -161,11 +168,12 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig)
-                .then(result => assert.deepEqual(result, {
+            return index.publishTemplate(templateConfig).then(result =>
+                assert.deepEqual(result, {
                     name: templateConfig.name,
                     version: templateConfig.version
-                }));
+                })
+            );
         });
 
         it('succeeds and does not throw an error given a name and namespace', () => {
@@ -177,11 +185,12 @@ describe('index', () => {
             templateConfig.namespace = 'meow';
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig)
-                .then(result => assert.deepEqual(result, {
+            return index.publishTemplate(templateConfig).then(result =>
+                assert.deepEqual(result, {
                     name: `${templateConfig.namespace}/${templateConfig.name}`,
                     version: templateConfig.version
-                }));
+                })
+            );
         });
 
         it('succeeds and does not show namespace if namespace is default', () => {
@@ -193,11 +202,12 @@ describe('index', () => {
             templateConfig.namespace = 'default';
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig)
-                .then(result => assert.deepEqual(result, {
+            return index.publishTemplate(templateConfig).then(result =>
+                assert.deepEqual(result, {
                     name: templateConfig.name,
                     version: templateConfig.version
-                }));
+                })
+            );
         });
     });
 
@@ -205,9 +215,10 @@ describe('index', () => {
         it('throws error when request yields an error', () => {
             requestMock.rejects(new Error('error'));
 
-            return index.removeTemplate(templateConfig.name)
+            return index
+                .removeTemplate(templateConfig.name)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
+                .catch(err => {
                     assert.equal(err.message, 'error');
                 });
         });
@@ -224,9 +235,10 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.removeTemplate(templateConfig.name)
+            return index
+                .removeTemplate(templateConfig.name)
                 .then(() => assert.fail('should not get here'))
-                .catch((err) => {
+                .catch(err => {
                     // eslint-disable-next-line max-len
                     const msg = 'Error removing template template/test. 403 (Forbidden): Fake forbidden message';
 
@@ -241,13 +253,14 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.removeTemplate(templateConfig.name)
+            return index
+                .removeTemplate(templateConfig.name)
                 .then(result => assert.deepEqual(result, { name: templateConfig.name }));
         });
     });
     describe('Template Tag', () => {
-        const url = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}` +
-            'templates/template%2Ftest/tags/stable';
+        const url = `${process.env.SD_API_URL ||
+            'https://api.screwdriver.cd/v4/'}templates/template%2Ftest/tags/stable`;
 
         describe('Create/Update a tag', () => {
             const config = {
@@ -259,9 +272,10 @@ describe('index', () => {
             it('throws error when request yields an error', () => {
                 requestMock.rejects(new Error('error'));
 
-                return index.tagTemplate(config)
+                return index
+                    .tagTemplate(config)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
+                    .catch(err => {
                         assert.equal(err.message, 'error');
                     });
             });
@@ -278,11 +292,11 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.tagTemplate(config)
+                return index
+                    .tagTemplate(config)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
-                        assert.equal(err.message,
-                            'Error tagging template. 403 (Forbidden): Fake forbidden message');
+                    .catch(err => {
+                        assert.equal(err.message, 'Error tagging template. 403 (Forbidden): Fake forbidden message');
                     });
             });
 
@@ -294,27 +308,26 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.tagTemplate(config)
-                    .then((result) => {
-                        assert.deepEqual(result, {
-                            name: config.name,
-                            tag: config.tag,
-                            version: config.version
-                        });
-                        assert.calledWith(requestMock, {
-                            method: 'PUT',
-                            url,
-                            auth: {
-                                bearer: process.env.SD_TOKEN
-                            },
-                            json: true,
-                            body: {
-                                version: '1.0.0'
-                            },
-                            resolveWithFullResponse: true,
-                            simple: false
-                        });
+                return index.tagTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        tag: config.tag,
+                        version: config.version
                     });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        body: {
+                            version: '1.0.0'
+                        },
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
             });
 
             it('succeeds and does not throw an error if request status code is 200', () => {
@@ -325,27 +338,26 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.tagTemplate(config)
-                    .then((result) => {
-                        assert.deepEqual(result, {
-                            name: config.name,
-                            version: config.version,
-                            tag: config.tag
-                        });
-                        assert.calledWith(requestMock, {
-                            method: 'PUT',
-                            url,
-                            auth: {
-                                bearer: process.env.SD_TOKEN
-                            },
-                            json: true,
-                            body: {
-                                version: '1.0.0'
-                            },
-                            resolveWithFullResponse: true,
-                            simple: false
-                        });
+                return index.tagTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        version: config.version,
+                        tag: config.tag
                     });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        body: {
+                            version: '1.0.0'
+                        },
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
             });
 
             it('succeeds when no version number is provided', () => {
@@ -355,26 +367,28 @@ describe('index', () => {
                 };
                 const versionsResponseFake = {
                     statusCode: 200,
-                    body: [{
-                        id: 23,
-                        labels: [],
-                        config: {
-                            image: 'node:6',
-                            steps: [
-                                {
-                                    echo: 'echo $FOO'
+                    body: [
+                        {
+                            id: 23,
+                            labels: [],
+                            config: {
+                                image: 'node:6',
+                                steps: [
+                                    {
+                                        echo: 'echo $FOO'
+                                    }
+                                ],
+                                environment: {
+                                    FOO: 'bar'
                                 }
-                            ],
-                            environment: {
-                                FOO: 'bar'
-                            }
-                        },
-                        name: 'tifftemplate',
-                        version: '1.0.0',
-                        description: 'test',
-                        maintainer: 'foo@bar.com',
-                        pipelineId: 113
-                    }]
+                            },
+                            name: 'tifftemplate',
+                            version: '1.0.0',
+                            description: 'test',
+                            maintainer: 'foo@bar.com',
+                            pipelineId: 113
+                        }
+                    ]
                 };
                 const resultResponseFake = {
                     statusCode: 201,
@@ -384,30 +398,29 @@ describe('index', () => {
                 requestMock.onFirstCall().resolves(versionsResponseFake);
                 requestMock.onSecondCall().resolves(resultResponseFake);
 
-                return index.tagTemplate(versionlessConfig)
-                    .then((result) => {
-                        assert.deepEqual(result, {
-                            name: config.name,
-                            tag: config.tag,
-                            version: config.version
-                        });
-                        assert.calledWith(requestMock, {
-                            method: 'PUT',
-                            url,
-                            auth: {
-                                bearer: process.env.SD_TOKEN
-                            },
-                            json: true,
-                            body: {
-                                version: '1.0.0'
-                            },
-                            resolveWithFullResponse: true,
-                            simple: false
-                        });
+                return index.tagTemplate(versionlessConfig).then(result => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        tag: config.tag,
+                        version: config.version
                     });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        body: {
+                            version: '1.0.0'
+                        },
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
             });
 
-            it('throws an error when getting latest template versions doesn\'t yield 200', () => {
+            it("throws an error when getting latest template versions doesn't yield 200", () => {
                 const versionlessConfig = {
                     name: config.name,
                     tag: config.tag
@@ -422,11 +435,14 @@ describe('index', () => {
 
                 requestMock.resolves(versionsResponseFake);
 
-                return index.tagTemplate(versionlessConfig)
+                return index
+                    .tagTemplate(versionlessConfig)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
-                        assert.equal(err.message, 'Error getting latest template version. ' +
-                            '404 (Not Found): Some 404 message');
+                    .catch(err => {
+                        assert.equal(
+                            err.message,
+                            'Error getting latest template version. 404 (Not Found): Some 404 message'
+                        );
                     });
             });
         });
@@ -440,16 +456,18 @@ describe('index', () => {
             it('throws error when request yields an error', () => {
                 requestMock.rejects(new Error('error'));
 
-                return index.getVersionFromTag(config)
+                return index
+                    .getVersionFromTag(config)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
+                    .catch(err => {
                         assert.equal(err.message, 'error');
                     });
             });
 
             it('succeeds and does not throw an error if request status code is 200', () => {
-                const versionUrl = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}`
-                    + 'templates/template%2Ftest/stable';
+                const versionUrl =
+                    `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}` +
+                    'templates/template%2Ftest/stable';
 
                 const responseFake = {
                     statusCode: 200,
@@ -458,20 +476,19 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.getVersionFromTag(config)
-                    .then((result) => {
-                        assert.deepEqual(result, templateConfig.version);
-                        assert.calledWith(requestMock, {
-                            method: 'GET',
-                            url: versionUrl,
-                            auth: {
-                                bearer: process.env.SD_TOKEN
-                            },
-                            json: true,
-                            resolveWithFullResponse: true,
-                            simple: false
-                        });
+                return index.getVersionFromTag(config).then(result => {
+                    assert.deepEqual(result, templateConfig.version);
+                    assert.calledWith(requestMock, {
+                        method: 'GET',
+                        url: versionUrl,
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        resolveWithFullResponse: true,
+                        simple: false
                     });
+                });
             });
         });
 
@@ -484,9 +501,10 @@ describe('index', () => {
             it('throws error when request yields an error', () => {
                 requestMock.rejects(new Error('error'));
 
-                return index.removeTag(config)
+                return index
+                    .removeTag(config)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
+                    .catch(err => {
                         assert.equal(err.message, 'error');
                     });
             });
@@ -503,11 +521,14 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.removeTag(config)
+                return index
+                    .removeTag(config)
                     .then(() => assert.fail('should not get here'))
-                    .catch((err) => {
-                        assert.equal(err.message,
-                            'Error removing template tag. 403 (Forbidden): Fake forbidden message');
+                    .catch(err => {
+                        assert.equal(
+                            err.message,
+                            'Error removing template tag. 403 (Forbidden): Fake forbidden message'
+                        );
                     });
             });
 
@@ -519,23 +540,22 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.removeTag(config)
-                    .then((result) => {
-                        assert.deepEqual(result, {
-                            name: config.name,
-                            tag: config.tag
-                        });
-                        assert.calledWith(requestMock, {
-                            method: 'DELETE',
-                            url,
-                            auth: {
-                                bearer: process.env.SD_TOKEN
-                            },
-                            json: true,
-                            resolveWithFullResponse: true,
-                            simple: false
-                        });
+                return index.removeTag(config).then(result => {
+                    assert.deepEqual(result, {
+                        name: config.name,
+                        tag: config.tag
                     });
+                    assert.calledWith(requestMock, {
+                        method: 'DELETE',
+                        url,
+                        auth: {
+                            bearer: process.env.SD_TOKEN
+                        },
+                        json: true,
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+                });
             });
         });
     });

@@ -12,8 +12,7 @@ const Yaml = require('js-yaml');
  * @return {Promise}    Promise that resolves to the template as a config object
  */
 function loadYaml(path) {
-    return new Promise(resolve =>
-        resolve(Yaml.safeLoad(fs.readFileSync(path, 'utf8'))));
+    return new Promise(resolve => resolve(Yaml.safeLoad(fs.readFileSync(path, 'utf8'))));
 }
 
 /**
@@ -36,11 +35,11 @@ function validateTemplate(config) {
         body: {
             yaml: JSON.stringify(config)
         }
-    }).then((response) => {
+    }).then(response => {
         if (response.errors.length > 0) {
             let errorMessage = 'Template is not valid for the following reasons:';
 
-            response.errors.forEach((err) => {
+            response.errors.forEach(err => {
                 /* eslint-disable prefer-template */
                 errorMessage += `\n${JSON.stringify(err, null, 4)},`;
                 /* eslint-enable prefer-template */
@@ -77,12 +76,11 @@ function publishTemplate(config) {
         },
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
-        const body = response.body;
+    }).then(response => {
+        const { body } = response;
 
         if (response.statusCode !== 201) {
-            throw new Error('Error publishing template. ' +
-            `${response.statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
         let fullTemplateName = body.name;
@@ -119,12 +117,11 @@ function removeTemplate(name) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
+    }).then(response => {
         const { body } = response;
 
         if (response.statusCode !== 204) {
-            throw new Error(`Error removing template ${name}. ` +
-            `${response.statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error removing template ${name}. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
         return { name };
@@ -151,12 +148,11 @@ function getLatestVersion(name) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
+    }).then(response => {
         const { body, statusCode } = response;
 
         if (statusCode !== 200) {
-            throw new Error('Error getting latest template version. ' +
-                `${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error getting latest template version. ${statusCode} (${body.error}): ${body.message}`);
         }
 
         return body[0].version;
@@ -185,12 +181,11 @@ function getVersionFromTag({ name, tag }) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
+    }).then(response => {
         const { body, statusCode } = response;
 
         if (statusCode !== 200) {
-            throw new Error('Error getting version from tag. ' +
-                `${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error getting version from tag. ${statusCode} (${body.error}): ${body.message}`);
         }
 
         return body.version;
@@ -213,8 +208,7 @@ function tagTemplate({ name, tag, version }) {
     const url = URL.resolve(hostname, `templates/${templateName}/tags/${templateTag}`);
 
     if (!version) {
-        return getLatestVersion(name)
-            .then(latest => tagTemplate({ name, tag, version: latest }));
+        return getLatestVersion(name).then(latest => tagTemplate({ name, tag, version: latest }));
     }
 
     return request({
@@ -229,12 +223,11 @@ function tagTemplate({ name, tag, version }) {
         },
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
+    }).then(response => {
         const { body, statusCode } = response;
 
         if (statusCode !== 201 && statusCode !== 200) {
-            throw new Error('Error tagging template. ' +
-            `${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error tagging template. ${statusCode} (${body.error}): ${body.message}`);
         }
 
         return {
@@ -268,12 +261,11 @@ function removeTag({ name, tag }) {
         json: true,
         resolveWithFullResponse: true,
         simple: false
-    }).then((response) => {
+    }).then(response => {
         const { body, statusCode } = response;
 
         if (statusCode !== 204) {
-            throw new Error('Error removing template tag. ' +
-            `${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(`Error removing template tag. ${statusCode} (${body.error}): ${body.message}`);
         }
 
         return {
