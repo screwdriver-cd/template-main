@@ -1,11 +1,10 @@
 'use strict';
 
+const nomnom = require('nomnom');
 const index = require('./index');
 const path = process.env.SD_TEMPLATE_PATH || './sd-template.yaml';
-const nomnom = require('nomnom');
 
 const operations = {
-
     /* Publish template */
     publish: {
         opts: {
@@ -13,22 +12,27 @@ const operations = {
             tag: { abbr: 't', default: 'latest', help: 'Add template tag' }
         },
         exec(opts) {
-            return index.loadYaml(path)
+            return index
+                .loadYaml(path)
                 .then(config => index.publishTemplate(config))
-                .then(publishResult => index.tagTemplate({
-                    name: publishResult.name,
-                    tag: opts.tag,
-                    version: publishResult.version
-                }))
-                .then((result) => {
+                .then(publishResult =>
+                    index.tagTemplate({
+                        name: publishResult.name,
+                        tag: opts.tag,
+                        version: publishResult.version
+                    })
+                )
+                .then(result => {
                     if (!opts.json) {
-                        console.log(`Template ${result.name}@${result.version} was `
-                            + `successfully published and tagged as ${result.tag}`);
+                        console.log(
+                            `Template ${result.name}@${result.version} was ` +
+                                `successfully published and tagged as ${result.tag}`
+                        );
                     } else {
                         console.log(JSON.stringify(result));
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -42,16 +46,17 @@ const operations = {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
         },
         exec(opts) {
-            return index.loadYaml(path)
+            return index
+                .loadYaml(path)
                 .then(config => index.validateTemplate(config))
-                .then((result) => {
+                .then(result => {
                     if (!opts.json) {
                         console.log('Template is valid');
                     } else {
                         console.log(JSON.stringify(result));
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -68,22 +73,22 @@ const operations = {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
         },
         exec(opts) {
-            return index.tagTemplate({
-                name: opts.name,
-                tag: opts.tag,
-                version: opts.version
-            })
-                .then((result) => {
+            return index
+                .tagTemplate({
+                    name: opts.name,
+                    tag: opts.tag,
+                    version: opts.version
+                })
+                .then(result => {
                     if (!opts.json) {
                         console.log(
-                            `Template ${result.name}@${result.version} was successfully ` +
-                            `tagged as ${result.tag}`
+                            `Template ${result.name}@${result.version} was successfully tagged as ${result.tag}`
                         );
                     } else {
                         console.log(JSON.stringify(result));
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -100,18 +105,19 @@ const operations = {
         },
 
         exec(opts) {
-            return index.removeTag({
-                name: opts.name,
-                tag: opts.tag
-            })
-                .then((result) => {
+            return index
+                .removeTag({
+                    name: opts.name,
+                    tag: opts.tag
+                })
+                .then(result => {
                     if (!opts.json) {
                         console.log(`Tag ${opts.tag} was successfully removed from ${opts.name}`);
                     } else {
                         console.log(JSON.stringify(result));
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -127,15 +133,16 @@ const operations = {
         },
 
         exec(opts) {
-            return index.removeTemplate(opts.name)
-                .then((result) => {
+            return index
+                .removeTemplate(opts.name)
+                .then(result => {
                     if (!opts.json) {
                         console.log(`Template ${result.name} was successfully removed`);
                     } else {
                         console.log(JSON.stringify(result));
                     }
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -151,14 +158,15 @@ const operations = {
         },
 
         exec(opts) {
-            return index.getVersionFromTag({
-                name: opts.name,
-                tag: opts.tag
-            })
-                .then((result) => {
+            return index
+                .getVersionFromTag({
+                    name: opts.name,
+                    tag: opts.tag
+                })
+                .then(result => {
                     console.log(`${result}`);
                 })
-                .catch((err) => {
+                .catch(err => {
                     console.error(err);
                     process.exit(1);
                 });
@@ -174,7 +182,8 @@ const operations = {
  * @return {Object}    result of command, if any
  */
 function run(name) {
-    const opts = nomnom.options(operations[name].opts)
+    const opts = nomnom
+        .options(operations[name].opts)
         .help(operations[name].help)
         .parse();
 
