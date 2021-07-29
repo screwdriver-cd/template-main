@@ -43,7 +43,7 @@ describe('index', () => {
 
         mockery.registerMock('fs', fsMock);
         mockery.registerMock('js-yaml', YamlMock);
-        mockery.registerMock('request-promise-native', requestMock);
+        mockery.registerMock('screwdriver-request', requestMock);
 
         // eslint-disable-next-line global-require
         index = require('../index');
@@ -317,15 +317,13 @@ describe('index', () => {
                     assert.calledWith(requestMock, {
                         method: 'PUT',
                         url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
+                        context: {
+                            token: process.env.SD_TOKEN,
+                            caller: 'tagTemplate'
                         },
-                        json: true,
-                        body: {
+                        json: {
                             version: '1.0.0'
-                        },
-                        resolveWithFullResponse: true,
-                        simple: false
+                        }
                     });
                 });
             });
@@ -347,15 +345,13 @@ describe('index', () => {
                     assert.calledWith(requestMock, {
                         method: 'PUT',
                         url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
+                        context: {
+                            token: process.env.SD_TOKEN,
+                            caller: 'tagTemplate'
                         },
-                        json: true,
-                        body: {
+                        json: {
                             version: '1.0.0'
-                        },
-                        resolveWithFullResponse: true,
-                        simple: false
+                        }
                     });
                 });
             });
@@ -407,15 +403,13 @@ describe('index', () => {
                     assert.calledWith(requestMock, {
                         method: 'PUT',
                         url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
+                        context: {
+                            token: process.env.SD_TOKEN,
+                            caller: 'tagTemplate'
                         },
-                        json: true,
-                        body: {
+                        json: {
                             version: '1.0.0'
-                        },
-                        resolveWithFullResponse: true,
-                        simple: false
+                        }
                     });
                 });
             });
@@ -447,7 +441,7 @@ describe('index', () => {
             });
         });
 
-        describe('Get version from a tag', () => {
+        describe('get version from a tag', () => {
             const config = {
                 name: 'template/test',
                 tag: 'stable'
@@ -481,18 +475,16 @@ describe('index', () => {
                     assert.calledWith(requestMock, {
                         method: 'GET',
                         url: versionUrl,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
-                        },
-                        json: true,
-                        resolveWithFullResponse: true,
-                        simple: false
+                        context: {
+                            token: process.env.SD_TOKEN,
+                            caller: 'getVersionFromTag'
+                        }
                     });
                 });
             });
         });
 
-        describe('Delete a tag', () => {
+        describe('delete a tag', () => {
             const config = {
                 name: 'template/test',
                 tag: 'stable'
@@ -548,12 +540,10 @@ describe('index', () => {
                     assert.calledWith(requestMock, {
                         method: 'DELETE',
                         url,
-                        auth: {
-                            bearer: process.env.SD_TOKEN
-                        },
-                        json: true,
-                        resolveWithFullResponse: true,
-                        simple: false
+                        context: {
+                            token: process.env.SD_TOKEN,
+                            caller: 'removeTag'
+                        }
                     });
                 });
             });
