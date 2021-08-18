@@ -318,8 +318,7 @@ describe('index', () => {
                         method: 'PUT',
                         url,
                         context: {
-                            token: process.env.SD_TOKEN,
-                            caller: 'tagTemplate'
+                            token: process.env.SD_TOKEN
                         },
                         json: {
                             version: '1.0.0'
@@ -346,8 +345,7 @@ describe('index', () => {
                         method: 'PUT',
                         url,
                         context: {
-                            token: process.env.SD_TOKEN,
-                            caller: 'tagTemplate'
+                            token: process.env.SD_TOKEN
                         },
                         json: {
                             version: '1.0.0'
@@ -404,8 +402,7 @@ describe('index', () => {
                         method: 'PUT',
                         url,
                         context: {
-                            token: process.env.SD_TOKEN,
-                            caller: 'tagTemplate'
+                            token: process.env.SD_TOKEN
                         },
                         json: {
                             version: '1.0.0'
@@ -476,8 +473,7 @@ describe('index', () => {
                         method: 'GET',
                         url: versionUrl,
                         context: {
-                            token: process.env.SD_TOKEN,
-                            caller: 'getVersionFromTag'
+                            token: process.env.SD_TOKEN
                         }
                     });
                 });
@@ -541,8 +537,7 @@ describe('index', () => {
                         method: 'DELETE',
                         url,
                         context: {
-                            token: process.env.SD_TOKEN,
-                            caller: 'removeTag'
+                            token: process.env.SD_TOKEN
                         }
                     });
                 });

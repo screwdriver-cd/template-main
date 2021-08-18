@@ -29,8 +29,7 @@ function validateTemplate(config) {
         method: 'POST',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'validateTemplate'
+            token: process.env.SD_TOKEN
         },
         json: {
             yaml: JSON.stringify(config)
@@ -68,8 +67,7 @@ function publishTemplate(config) {
         method: 'POST',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'publishTemplate'
+            token: process.env.SD_TOKEN
         },
         json: {
             yaml: JSON.stringify(config)
@@ -110,8 +108,7 @@ function removeTemplate(name) {
         method: 'DELETE',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'removeTemplate'
+            token: process.env.SD_TOKEN
         }
     }).then(response => {
         const { body } = response;
@@ -139,8 +136,7 @@ function getLatestVersion(name) {
         method: 'GET',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'getLatestVersion'
+            token: process.env.SD_TOKEN
         }
     }).then(response => {
         const { body, statusCode } = response;
@@ -170,8 +166,7 @@ function getVersionFromTag({ name, tag }) {
         method: 'GET',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'getVersionFromTag'
+            token: process.env.SD_TOKEN
         }
     }).then(response => {
         const { body, statusCode } = response;
@@ -207,8 +202,7 @@ function tagTemplate({ name, tag, version }) {
         method: 'PUT',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'tagTemplate'
+            token: process.env.SD_TOKEN
         },
         json: {
             version
@@ -246,8 +240,7 @@ function removeTag({ name, tag }) {
         method: 'DELETE',
         url,
         context: {
-            token: process.env.SD_TOKEN,
-            caller: 'removeTag'
+            token: process.env.SD_TOKEN
         }
     }).then(response => {
         const { body, statusCode } = response;
