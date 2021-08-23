@@ -43,7 +43,7 @@
   ],
   "devDependencies": {
     "chai": "^4.3.4",
-    "eslint": "^7.5.0",
+    "eslint": "^7.31.0",
     "eslint-config-screwdriver": "^5.0.1",
     "mocha": "^8.2.1",
     "mocha-multi-reporters": "^1.5.1",
@@ -55,8 +55,7 @@
   "dependencies": {
     "js-yaml": "^3.14.1",
     "nomnom": "^1.8.1",
-    "request": "^2.88.2",
-    "request-promise-native": "^1.0.9"
+    "screwdriver-request": "^1.0.1"
   },
   "release": {
     "debug": false,

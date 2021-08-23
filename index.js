@@ -1,6 +1,6 @@
 'use strict';
 
-const request = require('request-promise-native');
+const request = require('screwdriver-request');
 const fs = require('fs');
 const URL = require('url');
 const Yaml = require('js-yaml');
@@ -28,11 +28,10 @@ function validateTemplate(config) {
     return request({
         method: 'POST',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
+        context: {
+            token: process.env.SD_TOKEN
         },
-        json: true,
-        body: {
+        json: {
             yaml: JSON.stringify(config)
         }
     }).then(response => {
@@ -67,15 +66,12 @@ function publishTemplate(config) {
     return request({
         method: 'POST',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
+        context: {
+            token: process.env.SD_TOKEN
         },
-        json: true,
-        body: {
+        json: {
             yaml: JSON.stringify(config)
-        },
-        resolveWithFullResponse: true,
-        simple: false
+        }
     }).then(response => {
         const { body } = response;
 
@@ -111,12 +107,9 @@ function removeTemplate(name) {
     return request({
         method: 'DELETE',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
-        },
-        json: true,
-        resolveWithFullResponse: true,
-        simple: false
+        context: {
+            token: process.env.SD_TOKEN
+        }
     }).then(response => {
         const { body } = response;
 
@@ -142,12 +135,9 @@ function getLatestVersion(name) {
     return request({
         method: 'GET',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
-        },
-        json: true,
-        resolveWithFullResponse: true,
-        simple: false
+        context: {
+            token: process.env.SD_TOKEN
+        }
     }).then(response => {
         const { body, statusCode } = response;
 
@@ -175,12 +165,9 @@ function getVersionFromTag({ name, tag }) {
     return request({
         method: 'GET',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
-        },
-        json: true,
-        resolveWithFullResponse: true,
-        simple: false
+        context: {
+            token: process.env.SD_TOKEN
+        }
     }).then(response => {
         const { body, statusCode } = response;
 
@@ -214,15 +201,12 @@ function tagTemplate({ name, tag, version }) {
     return request({
         method: 'PUT',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
+        context: {
+            token: process.env.SD_TOKEN
         },
-        json: true,
-        body: {
+        json: {
             version
-        },
-        resolveWithFullResponse: true,
-        simple: false
+        }
     }).then(response => {
         const { body, statusCode } = response;
 
@@ -255,12 +239,9 @@ function removeTag({ name, tag }) {
     return request({
         method: 'DELETE',
         url,
-        auth: {
-            bearer: process.env.SD_TOKEN
-        },
-        json: true,
-        resolveWithFullResponse: true,
-        simple: false
+        context: {
+            token: process.env.SD_TOKEN
+        }
     }).then(response => {
         const { body, statusCode } = response;
 
