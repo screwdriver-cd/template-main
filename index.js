@@ -35,10 +35,12 @@ function validateTemplate(config) {
             yaml: JSON.stringify(config)
         }
     }).then(response => {
-        if (response.errors.length > 0) {
+        const { body } = response;
+
+        if (body.errors.length > 0) {
             let errorMessage = 'Template is not valid for the following reasons:';
 
-            response.errors.forEach(err => {
+            body.errors.forEach(err => {
                 /* eslint-disable prefer-template */
                 errorMessage += `\n${JSON.stringify(err, null, 4)},`;
                 /* eslint-enable prefer-template */
