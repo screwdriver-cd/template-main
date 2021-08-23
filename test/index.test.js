@@ -81,17 +81,19 @@ describe('index', () => {
 
         it('throws error if response template is invalid', () => {
             const responseFake = {
-                errors: [
-                    {
-                        message: '"steps" is required',
-                        path: 'config.steps',
-                        type: 'any.required',
-                        context: {
-                            key: 'steps'
+                body: {
+                    errors: [
+                        {
+                            message: '"steps" is required',
+                            path: 'config.steps',
+                            type: 'any.required',
+                            context: {
+                                key: 'steps'
+                            }
                         }
-                    }
-                ],
-                template: {}
+                    ],
+                    template: {}
+                }
             };
 
             requestMock.resolves(responseFake);
@@ -114,8 +116,10 @@ describe('index', () => {
 
         it('resolves if template is valid', () => {
             const responseFake = {
-                errors: [],
-                template: templateConfig
+                body: {
+                    errors: [],
+                    template: templateConfig
+                }
             };
 
             requestMock.resolves(responseFake);
