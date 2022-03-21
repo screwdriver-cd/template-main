@@ -1,12 +1,11 @@
 {
   "name": "screwdriver-template-main",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Validates, publishes, and tags templates",
   "main": "index.js",
   "scripts": {
     "pretest": "eslint .",
-    "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true",
-    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
+    "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true"
   },
   "bin": {
     "sd-template-tool": "./bin/main.js",
@@ -19,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:screwdriver-cd/template-main.git"
+    "url": "git+https://github.com/screwdriver-cd/template-main.git"
   },
   "homepage": "https://github.com/screwdriver-cd/template-main",
   "bugs": "https://github.com/screwdriver-cd/screwdriver/issues",
@@ -58,9 +57,9 @@
     "screwdriver-request": "^1.0.1"
   },
   "release": {
-    "debug": false,
-    "verifyConditions": {
-      "path": "./node_modules/semantic-release/src/lib/plugin-noop.js"
-    }
+    "debug": false
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
