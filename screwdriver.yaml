@@ -11,7 +11,7 @@ jobs:
             - test: npm test
     publish:
         requires: main
-        template: screwdriver-cd/semantic-release@1.0.2
+        template: screwdriver-cd/semantic-release
         secrets:
             # Publishing to NPM
             - NPM_TOKEN
