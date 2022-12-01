@@ -23,7 +23,7 @@ describe('index', () => {
     beforeEach(() => {
         requestMock = sinon.stub();
         YamlMock = {
-            safeLoad: sinon.stub()
+            load: sinon.stub()
         };
         fsMock = {
             readFileSync: sinon.stub()
@@ -39,7 +39,7 @@ describe('index', () => {
             }
         };
 
-        YamlMock.safeLoad.returns(templateConfig);
+        YamlMock.load.returns(templateConfig);
 
         mockery.registerMock('fs', fsMock);
         mockery.registerMock('js-yaml', YamlMock);
@@ -61,7 +61,7 @@ describe('index', () => {
 
     describe('Load Yaml', () => {
         it('resolves if loads successfully', () => {
-            YamlMock.safeLoad.resolves('yamlcontent');
+            YamlMock.load.resolves('yamlcontent');
 
             return index.loadYaml(config => assert.equal(config, 'yamlcontent'));
         });
