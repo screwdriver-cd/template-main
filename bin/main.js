@@ -10,11 +10,7 @@ const nomnom = require('nomnom');
 const { operations } = require('../commands');
 
 Object.keys(operations).forEach(key => {
-    nomnom
-        .command(key)
-        .options(operations[key].opts)
-        .callback(operations[key].exec)
-        .help(operations[key].help);
+    nomnom.command(key).options(operations[key].opts).callback(operations[key].exec).help(operations[key].help);
 });
 
 nomnom.parse();

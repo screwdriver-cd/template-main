@@ -263,8 +263,9 @@ describe('index', () => {
         });
     });
     describe('Template Tag', () => {
-        const url = `${process.env.SD_API_URL ||
-            'https://api.screwdriver.cd/v4/'}templates/template%2Ftest/tags/stable`;
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }templates/template%2Ftest/tags/stable`;
 
         describe('Create/Update a tag', () => {
             const config = {
