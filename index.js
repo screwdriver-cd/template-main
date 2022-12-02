@@ -12,7 +12,9 @@ const Yaml = require('js-yaml');
  * @return {Promise}    Promise that resolves to the template as a config object
  */
 function loadYaml(path) {
-    return new Promise(resolve => resolve(Yaml.safeLoad(fs.readFileSync(path, 'utf8'))));
+    return new Promise(resolve => {
+        resolve(Yaml.load(fs.readFileSync(path, 'utf8')));
+    });
 }
 
 /**

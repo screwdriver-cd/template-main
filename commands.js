@@ -182,10 +182,7 @@ const operations = {
  * @return {Object}    result of command, if any
  */
 function run(name) {
-    const opts = nomnom
-        .options(operations[name].opts)
-        .help(operations[name].help)
-        .parse();
+    const opts = nomnom.options(operations[name].opts).help(operations[name].help).parse();
 
     return operations[name].exec(opts);
 }
