@@ -126,6 +126,39 @@ function removeTemplate(name) {
 }
 
 /**
+ * Removes specified version of a template by sending a delete request to the SDAPI /templates/{name}/versions/{version} endpoint
+ * @method removeTemplate
+ * @param  {Object}    config
+ * @param  {String}    config.name    Template name
+ * @param  {String}    config.version Template version to be removed
+ * @return {Promise}                  Resolves if removed successfully
+ */
+function removeVersion({ name, version }) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const templateName = encodeURIComponent(name);
+    const templateVersion = encodeURIComponent(version);
+    const url = URL.resolve(hostname, `templates/${templateName}/versions/${templateVersion}`);
+
+    return request({
+        method: 'DELETE',
+        url,
+        context: {
+            token: process.env.SD_TOKEN
+        }
+    }).then(response => {
+        const { body } = response;
+
+        if (response.statusCode !== 204) {
+            throw new Error(
+                `Error removing version ${version} of template ${name}. ${response.statusCode} (${body.error}): ${body.message}`
+            );
+        }
+
+        return { name, version };
+    });
+}
+
+/**
  * Helper function that returns the latest version for a template
  * @method getLatestVersion
  * @param  {String}         name        Template name
@@ -264,6 +297,7 @@ module.exports = {
     validateTemplate,
     publishTemplate,
     removeTemplate,
+    removeVersion,
     tagTemplate,
     removeTag,
     getVersionFromTag

@@ -125,6 +125,35 @@ const operations = {
         help: 'remove tag'
     },
 
+    /* Remove template version */
+    remove_version: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            version: { abbr: 'v', required: true, help: 'Version' },
+            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+        },
+
+        exec(opts) {
+            return index
+                .removeVersion({
+                    name: opts.name,
+                    version: opts.version
+                })
+                .then(result => {
+                    if (!opts.json) {
+                        console.log(`Version ${opts.version} was successfully removed from ${opts.name}`);
+                    } else {
+                        console.log(JSON.stringify(result));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        },
+        help: 'remove version'
+    },
+
     /* remove a template */
     remove_template: {
         opts: {

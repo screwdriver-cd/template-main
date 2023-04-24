@@ -14,6 +14,7 @@
     "template-remove": "./bin/remove.js",
     "template-tag": "./bin/tag.js",
     "template-remove-tag": "./bin/removeTag.js",
+    "template-remove-version": "./bin/removeVersion.js",
     "template-get-version-from-tag": "./bin/getVersionFromTag.js"
   },
   "repository": {
@@ -31,6 +32,7 @@
   "contributors": [
     "Dao Lam <daolam112@gmail.com>",
     "Darren Matsumoto <aeneascorrupt@gmail.com>",
+    "Dayanand Sagar <sagar1312@gmail.com>",
     "Jeremiah Wuenschel <jeremiah.wuenschel@gmail.com>",
     "Jerry Zhang <thejerryzhang@gmail.com>",
     "Min Zhang <minzhang@andrew.cmu.edu>",
