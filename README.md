@@ -101,6 +101,35 @@ $ ./node_modules/.bin/template-remove --json --name templateName
 {"name":"templateName"}
 ```
 
+### Removing a template version
+
+To remove a specific version of a template, run the `template-remove-version` binary. This must be done in the same pipeline that published the template. You'll need to specify the template name and version as arguments.
+Removing a template version will remove all the tags associated with it.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and version removal as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/template-publish
+            - tag: ./node_modules/.bin/template-tag --name templateName --version 1.0.0 --tag latest
+    detached_remove_version:
+        steps:
+            - remove: ./node_modules/.bin/template-remove-version --name templateName --version 1.0.0
+```
+
+`template-remove-tag` can print a result as json by passing `--json` option to the command.
+
 ### Tagging a template
 
 Optionally, tag a template using the `template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag. You can optionally specify a version; the version must be an exact version, not just a major or major.minor one. If omitted, the latest version will be tagged.

@@ -262,6 +262,74 @@ describe('index', () => {
                 .then(result => assert.deepEqual(result, { name: templateConfig.name }));
         });
     });
+
+    describe('Remove version', () => {
+        const config = {
+            name: 'template/test',
+            version: '1.0.1'
+        };
+
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }templates/template%2Ftest/versions/1.0.1`;
+
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
+
+            return index
+                .removeVersion(config)
+                .then(() => assert.fail('should not get here'))
+                .catch(err => {
+                    assert.equal(err.message, 'error');
+                });
+        });
+
+        it('throws error for the corresponding request error status code if not 204', () => {
+            const responseFake = {
+                statusCode: 403,
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index
+                .removeVersion(config)
+                .then(() => assert.fail('should not get here'))
+                .catch(err => {
+                    assert.equal(
+                        err.message,
+                        'Error removing version 1.0.1 of template template/test. 403 (Forbidden): Fake forbidden message'
+                    );
+                });
+        });
+
+        it('succeeds and does not throw an error if request status code is 204', () => {
+            const responseFake = {
+                statusCode: 204
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.removeVersion(config).then(result => {
+                assert.deepEqual(result, {
+                    name: config.name,
+                    version: config.version
+                });
+                assert.calledWith(requestMock, {
+                    method: 'DELETE',
+                    url,
+                    context: {
+                        token: process.env.SD_TOKEN
+                    }
+                });
+            });
+        });
+    });
+
     describe('Template Tag', () => {
         const url = `${
             process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
