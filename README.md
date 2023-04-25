@@ -104,7 +104,7 @@ $ ./node_modules/.bin/template-remove --json --name templateName
 ### Removing a template version
 
 To remove a specific version of a template, run the `template-remove-version` binary. This must be done in the same pipeline that published the template. You'll need to specify the template name and version as arguments.
-Removing a template version, will remove all the tags associated with it.
+Removing a template version will remove all the tags associated with it.
 
 Example `screwdriver.yaml` with validation, publishing and tagging, and version removal as a detached job:
 
