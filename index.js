@@ -25,7 +25,7 @@ function loadYaml(path) {
  */
 function validateTemplate(config) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'validator/template');
+    const url = URL.resolve(hostname, 'validator/template'); /* sd -> template-validator.js */
 
     return request({
         method: 'POST',
@@ -292,6 +292,41 @@ function removeTag({ name, tag }) {
         };
     });
 }
+
+function validatePipelineTemplate(config) {
+    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const url = URL.resolve(hostname, 'pipeline/template/validate'); /* sd -> template-validator.js */
+
+    return request({
+        method: 'POST',
+        url,
+        context: {
+            token: process.env.SD_TOKEN
+        },
+        json: {
+            yaml: JSON.stringify(config)
+        }
+    }).then(response => {
+        const { body } = response;
+
+        if (body.errors.length > 0) {
+            let errorMessage = 'Template is not valid for the following reasons:';
+
+            body.errors.forEach(err => {
+                /* eslint-disable prefer-template */
+                errorMessage += `\n${JSON.stringify(err, null, 4)},`;
+                /* eslint-enable prefer-template */
+            });
+
+            throw new Error(errorMessage);
+        }
+
+        return {
+            valid: true
+        };
+    });
+}
+
 module.exports = {
     loadYaml,
     validateTemplate,
@@ -300,5 +335,6 @@ module.exports = {
     removeVersion,
     tagTemplate,
     removeTag,
-    getVersionFromTag
+    getVersionFromTag,
+    validatePipelineTemplate
 };

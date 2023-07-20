@@ -26,7 +26,7 @@ const operations = {
                     if (!opts.json) {
                         console.log(
                             `Template ${result.name}@${result.version} was ` +
-                                `successfully published and tagged as ${result.tag}`
+                            `successfully published and tagged as ${result.tag}`
                         );
                     } else {
                         console.log(JSON.stringify(result));
@@ -201,6 +201,29 @@ const operations = {
                 });
         },
         help: 'get version from tag'
+    },
+
+    pipelineValidate: {
+        opts: {
+            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+        },
+        exec(opts) {
+            return index
+                .loadYaml(path)
+                .then(config => index.validatePipelineTemplate(config))
+                .then(result => {
+                    if (!opts.json) {
+                        console.log('Template is valid');
+                    } else {
+                        console.log(JSON.stringify(result));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        },
+        help: 'validate template'
     }
 };
 
