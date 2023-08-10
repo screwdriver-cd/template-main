@@ -16,7 +16,8 @@
         "template-remove-tag": "./bin/removeTag.js",
         "template-remove-version": "./bin/removeVersion.js",
         "template-get-version-from-tag": "./bin/getVersionFromTag.js",
-        "pipeline-template-validate": "./bin/pipelineValidate.js"
+        "pipeline-template-validate": "./bin/pipelineTemplateValidate.js",
+        "pipeline-template-publish": "./bin/pipelineTemplatePublish.js"
     },
     "repository": {
         "type": "git",
@@ -56,6 +57,7 @@
     },
     "dependencies": {
         "js-yaml": "^4.1.0",
+        "jsdoc": "^4.0.2",
         "nomnom": "^1.8.1",
         "screwdriver-request": "^2.0.1"
     },

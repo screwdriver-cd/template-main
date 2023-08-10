@@ -1,8 +1,8 @@
 'use strict';
 
-const request = require('screwdriver-request');
 const fs = require('fs');
 const URL = require('url');
+const request = require('screwdriver-request');
 const Yaml = require('js-yaml');
 
 /**
@@ -17,15 +17,10 @@ function loadYaml(path) {
     });
 }
 
-/**
- * Validates the template yaml
- * @method validateTemplate
- * @param   {Object}        config          Template config
- * @return {Promise}         Resolves when template is valid/rejects when error or invalid
- */
-function validateTemplate(config) {
+// eslint-disable-next-line require-jsdoc
+function validateTemplate(config, apiURL) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'validator/template'); /* sd -> template-validator.js */
+    const url = URL.resolve(hostname, apiURL);
 
     return request({
         method: 'POST',
@@ -43,9 +38,7 @@ function validateTemplate(config) {
             let errorMessage = 'Template is not valid for the following reasons:';
 
             body.errors.forEach(err => {
-                /* eslint-disable prefer-template */
                 errorMessage += `\n${JSON.stringify(err, null, 4)},`;
-                /* eslint-enable prefer-template */
             });
 
             throw new Error(errorMessage);
@@ -55,6 +48,16 @@ function validateTemplate(config) {
             valid: true
         };
     });
+}
+
+// eslint-disable-next-line require-jsdoc
+function validateJobTemplate(config) {
+    return validateTemplate(config, 'validator/template');
+}
+
+// eslint-disable-next-line require-jsdoc
+function validatePipelineTemplate(config) {
+    return validateTemplate(config, 'validator/pipelineTemplate');
 }
 
 /**
@@ -293,9 +296,10 @@ function removeTag({ name, tag }) {
     });
 }
 
-function validatePipelineTemplate(config) {
+// eslint-disable-next-line require-jsdoc
+function publishPipelineTemplate(config) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'pipeline/template/validate'); /* sd -> template-validator.js */
+    const url = URL.resolve(hostname, '/pipeline/template/publish');
 
     return request({
         method: 'POST',
@@ -309,32 +313,26 @@ function validatePipelineTemplate(config) {
     }).then(response => {
         const { body } = response;
 
-        if (body.errors.length > 0) {
-            let errorMessage = 'Template is not valid for the following reasons:';
-
-            body.errors.forEach(err => {
-                /* eslint-disable prefer-template */
-                errorMessage += `\n${JSON.stringify(err, null, 4)},`;
-                /* eslint-enable prefer-template */
-            });
-
-            throw new Error(errorMessage);
+        if (response.statusCode !== 201) {
+            throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
         return {
-            valid: true
+            name: body.name,
+            version: body.version
         };
     });
 }
 
 module.exports = {
     loadYaml,
-    validateTemplate,
+    validateJobTemplate,
     publishTemplate,
     removeTemplate,
     removeVersion,
     tagTemplate,
     removeTag,
     getVersionFromTag,
-    validatePipelineTemplate
+    validatePipelineTemplate,
+    publishPipelineTemplate
 };
