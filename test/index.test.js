@@ -72,7 +72,7 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index
-                .validateTemplate(templateConfig)
+                .validateJobTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(err.message, 'error');
@@ -99,7 +99,7 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index
-                .validateTemplate(templateConfig)
+                .validateJobTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     // eslint-disable-next-line max-len
@@ -124,7 +124,7 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.validateTemplate(templateConfig).then(result =>
+            return index.validateJobTemplate(templateConfig).then(result =>
                 assert.deepEqual(result, {
                     valid: true
                 })
@@ -137,7 +137,7 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index
-                .publishTemplate(templateConfig)
+                .publishJobTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(err.message, 'error');
@@ -157,7 +157,7 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index
-                .publishTemplate(templateConfig)
+                .publishJobTemplate(templateConfig)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(err.message, 'Error publishing template. 403 (Forbidden): Fake forbidden message');
@@ -172,7 +172,7 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig).then(result =>
+            return index.publishJobTemplate(templateConfig).then(result =>
                 assert.deepEqual(result, {
                     name: templateConfig.name,
                     version: templateConfig.version
@@ -189,7 +189,7 @@ describe('index', () => {
             templateConfig.namespace = 'meow';
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig).then(result =>
+            return index.publishJobTemplate(templateConfig).then(result =>
                 assert.deepEqual(result, {
                     name: `${templateConfig.namespace}/${templateConfig.name}`,
                     version: templateConfig.version
@@ -206,7 +206,7 @@ describe('index', () => {
             templateConfig.namespace = 'default';
             requestMock.resolves(responseFake);
 
-            return index.publishTemplate(templateConfig).then(result =>
+            return index.publishJobTemplate(templateConfig).then(result =>
                 assert.deepEqual(result, {
                     name: templateConfig.name,
                     version: templateConfig.version

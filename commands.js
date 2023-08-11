@@ -64,7 +64,7 @@ const operations = {
         help: 'validate template'
     },
 
-    /* Add tag for template */
+    /* Add tag for job template */
     tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -96,7 +96,7 @@ const operations = {
         help: 'add tag'
     },
 
-    /* Remove tag for template */
+    /* Remove tag for job template */
     remove_tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -125,7 +125,7 @@ const operations = {
         help: 'remove tag'
     },
 
-    /* Remove template version */
+    /* Remove job template version */
     remove_version: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -154,7 +154,7 @@ const operations = {
         help: 'remove version'
     },
 
-    /* remove a template */
+    /* remove a job template */
     remove_template: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -179,7 +179,7 @@ const operations = {
         help: 'remove template'
     },
 
-    /* get version number from tag */
+    /* get job template version number from tag */
     get_version_from_tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },

@@ -103,10 +103,7 @@ function publishTemplate(config, apiURL) {
             throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
-        return {
-            name: body.name,
-            version: body.version
-        };
+        return body;
     });
 }
 
@@ -117,7 +114,19 @@ function publishTemplate(config, apiURL) {
  * @return {Promise}        Resolves if publishes successfully
  */
 function publishJobTemplate(config) {
-    return publishTemplate(config, 'templates');
+    return publishTemplate(config, 'templates').then(template => {
+        let fullTemplateName = template.name;
+
+        // Figure out template name
+        if (template.namespace && template.namespace !== 'default') {
+            fullTemplateName = `${template.namespace}/${template.name}`;
+        }
+
+        return {
+            name: fullTemplateName,
+            version: template.version
+        };
+    });
 }
 
 /**

@@ -1,70 +1,69 @@
 {
-    "name": "screwdriver-template-main",
-    "version": "2.0.0",
-    "description": "Validates, publishes, and tags templates",
-    "main": "index.js",
-    "scripts": {
-        "pretest": "eslint .",
-        "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true"
-    },
-    "bin": {
-        "sd-template-tool": "./bin/main.js",
-        "template-publish": "./bin/publish.js",
-        "template-validate": "./bin/validate.js",
-        "template-remove": "./bin/remove.js",
-        "template-tag": "./bin/tag.js",
-        "template-remove-tag": "./bin/removeTag.js",
-        "template-remove-version": "./bin/removeVersion.js",
-        "template-get-version-from-tag": "./bin/getVersionFromTag.js",
-        "pipeline-template-validate": "./bin/pipelineTemplateValidate.js",
-        "pipeline-template-publish": "./bin/pipelineTemplatePublish.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/screwdriver-cd/template-main.git"
-    },
-    "homepage": "https://github.com/screwdriver-cd/template-main",
-    "bugs": "https://github.com/screwdriver-cd/screwdriver/issues",
-    "keywords": [
-        "screwdriver",
-        "yahoo"
-    ],
-    "license": "BSD-3-Clause",
-    "author": "Tiffany Kyi <tiffanykyi@gmail.com>",
-    "contributors": [
-        "Dao Lam <daolam112@gmail.com>",
-        "Darren Matsumoto <aeneascorrupt@gmail.com>",
-        "Dayanand Sagar <sagar1312@gmail.com>",
-        "Jeremiah Wuenschel <jeremiah.wuenschel@gmail.com>",
-        "Jerry Zhang <thejerryzhang@gmail.com>",
-        "Min Zhang <minzhang@andrew.cmu.edu>",
-        "Peter Peterson <jedipetey@gmail.com>",
-        "Philip Scott <pscott@zeptohost.com>",
-        "Reetika Rastogi <r3rastogi@gmail.com>",
-        "St. John Johnson <st.john.johnson@gmail.com>",
-        "Tiffany Kyi <tiffanykyi@gmail.com>"
-    ],
-    "devDependencies": {
-        "chai": "^4.3.7",
-        "eslint": "^8.28.0",
-        "eslint-config-screwdriver": "^7.0.0",
-        "mocha": "^10.1.0",
-        "mocha-multi-reporters": "^1.5.1",
-        "mocha-sonarqube-reporter": "^1.0.2",
-        "mockery": "^2.1.0",
-        "nyc": "^15.1.0",
-        "sinon": "^15.0.0"
-    },
-    "dependencies": {
-        "js-yaml": "^4.1.0",
-        "jsdoc": "^4.0.2",
-        "nomnom": "^1.8.1",
-        "screwdriver-request": "^2.0.1"
-    },
-    "release": {
-        "debug": false
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    }
+  "name": "screwdriver-template-main",
+  "version": "2.0.0",
+  "description": "Validates, publishes, and tags templates",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "nyc --report-dir ./artifacts/coverage --reporter=lcov mocha --reporter mocha-multi-reporters --reporter-options configFile=./mocha.config.json --recursive --timeout 4000 --retries 1 --exit --allow-uncaught true --color true"
+  },
+  "bin": {
+    "sd-template-tool": "./bin/main.js",
+    "template-publish": "./bin/publish.js",
+    "template-validate": "./bin/validate.js",
+    "template-remove": "./bin/remove.js",
+    "template-tag": "./bin/tag.js",
+    "template-remove-tag": "./bin/removeTag.js",
+    "template-remove-version": "./bin/removeVersion.js",
+    "template-get-version-from-tag": "./bin/getVersionFromTag.js",
+    "pipeline-template-validate": "./bin/pipelineTemplateValidate.js",
+    "pipeline-template-publish": "./bin/pipelineTemplatePublish.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/screwdriver-cd/template-main.git"
+  },
+  "homepage": "https://github.com/screwdriver-cd/template-main",
+  "bugs": "https://github.com/screwdriver-cd/screwdriver/issues",
+  "keywords": [
+    "screwdriver",
+    "yahoo"
+  ],
+  "license": "BSD-3-Clause",
+  "author": "Tiffany Kyi <tiffanykyi@gmail.com>",
+  "contributors": [
+    "Dao Lam <daolam112@gmail.com>",
+    "Darren Matsumoto <aeneascorrupt@gmail.com>",
+    "Dayanand Sagar <sagar1312@gmail.com>",
+    "Jeremiah Wuenschel <jeremiah.wuenschel@gmail.com>",
+    "Jerry Zhang <thejerryzhang@gmail.com>",
+    "Min Zhang <minzhang@andrew.cmu.edu>",
+    "Peter Peterson <jedipetey@gmail.com>",
+    "Philip Scott <pscott@zeptohost.com>",
+    "Reetika Rastogi <r3rastogi@gmail.com>",
+    "St. John Johnson <st.john.johnson@gmail.com>",
+    "Tiffany Kyi <tiffanykyi@gmail.com>"
+  ],
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.28.0",
+    "eslint-config-screwdriver": "^7.0.0",
+    "mocha": "^10.1.0",
+    "mocha-multi-reporters": "^1.5.1",
+    "mocha-sonarqube-reporter": "^1.0.2",
+    "mockery": "^2.1.0",
+    "nyc": "^15.1.0",
+    "sinon": "^15.0.0"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.0",
+    "nomnom": "^1.8.1",
+    "screwdriver-request": "^2.0.1"
+  },
+  "release": {
+    "debug": false
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
