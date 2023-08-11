@@ -5,7 +5,7 @@ const index = require('./index');
 const path = process.env.SD_TEMPLATE_PATH || './sd-template.yaml';
 
 const operations = {
-    /* Publish template */
+    /* Publish job template */
     publish: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' },
@@ -14,7 +14,7 @@ const operations = {
         exec(opts) {
             return index
                 .loadYaml(path)
-                .then(config => index.publishTemplate(config))
+                .then(config => index.publishJobTemplate(config))
                 .then(publishResult =>
                     index.tagTemplate({
                         name: publishResult.name,
@@ -40,7 +40,7 @@ const operations = {
         help: 'publish template'
     },
 
-    /* Validate template */
+    /* Validate job template */
     validate: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
@@ -48,7 +48,7 @@ const operations = {
         exec(opts) {
             return index
                 .loadYaml(path)
-                .then(config => index.validateTemplate(config))
+                .then(config => index.validateJobTemplate(config))
                 .then(result => {
                     if (!opts.json) {
                         console.log('Template is valid');
@@ -64,7 +64,7 @@ const operations = {
         help: 'validate template'
     },
 
-    /* Add tag for template */
+    /* Add tag for job template */
     tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -96,7 +96,7 @@ const operations = {
         help: 'add tag'
     },
 
-    /* Remove tag for template */
+    /* Remove tag for job template */
     remove_tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -125,7 +125,7 @@ const operations = {
         help: 'remove tag'
     },
 
-    /* Remove template version */
+    /* Remove job template version */
     remove_version: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -154,7 +154,7 @@ const operations = {
         help: 'remove version'
     },
 
-    /* remove a template */
+    /* remove a job template */
     remove_template: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -179,7 +179,7 @@ const operations = {
         help: 'remove template'
     },
 
-    /* get version number from tag */
+    /* get job template version number from tag */
     get_version_from_tag: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -201,6 +201,54 @@ const operations = {
                 });
         },
         help: 'get version from tag'
+    },
+
+    /* Validate pipeline template */
+    validatePipelineTemplate: {
+        opts: {
+            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+        },
+        exec(opts) {
+            return index
+                .loadYaml(path)
+                .then(config => index.validatePipelineTemplate(config))
+                .then(result => {
+                    if (!opts.json) {
+                        console.log('Template is valid');
+                    } else {
+                        console.log(JSON.stringify(result));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        },
+        help: 'validate pipeline template'
+    },
+
+    /* Publish pipeline template */
+    publishPipelineTemplate: {
+        opts: {
+            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+        },
+        exec(opts) {
+            return index
+                .loadYaml(path)
+                .then(config => index.publishPipelineTemplate(config))
+                .then(result => {
+                    if (!opts.json) {
+                        console.log(`Pipeline template ${result.name}@${result.version} was successfully published`);
+                    } else {
+                        console.log(JSON.stringify(result));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        },
+        help: 'publish pipeline template'
     }
 };
 

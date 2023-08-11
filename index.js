@@ -1,8 +1,8 @@
 'use strict';
 
-const request = require('screwdriver-request');
 const fs = require('fs');
 const URL = require('url');
+const request = require('screwdriver-request');
 const Yaml = require('js-yaml');
 
 /**
@@ -18,14 +18,15 @@ function loadYaml(path) {
 }
 
 /**
- * Validates the template yaml
+ * Validates the jobs and pipeline template yaml by posting to the endpoint
  * @method validateTemplate
- * @param   {Object}        config          Template config
- * @return {Promise}         Resolves when template is valid/rejects when error or invalid
+ * @param  {Object}         config          Template config
+ * @param  {String}         apiURL          endpoint API
+ * @return {Promise}        Resolves if validates successfully
  */
-function validateTemplate(config) {
+function validateTemplate(config, apiURL) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'validator/template');
+    const url = URL.resolve(hostname, apiURL);
 
     return request({
         method: 'POST',
@@ -43,9 +44,7 @@ function validateTemplate(config) {
             let errorMessage = 'Template is not valid for the following reasons:';
 
             body.errors.forEach(err => {
-                /* eslint-disable prefer-template */
                 errorMessage += `\n${JSON.stringify(err, null, 4)},`;
-                /* eslint-enable prefer-template */
             });
 
             throw new Error(errorMessage);
@@ -58,14 +57,35 @@ function validateTemplate(config) {
 }
 
 /**
- * Publishes the template yaml by posting to the SDAPI /templates endpoint
+ * Validates the job template yaml by using the validateTemplate method and passing the API endpoint
+ * @method validateJobTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if validates successfully
+ */
+function validateJobTemplate(config) {
+    return validateTemplate(config, 'validator/template');
+}
+
+/**
+ * Validates the pipeline template yaml by using the validateTemplate method and passing the API endpoint
+ * @method validatePipelineTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if validates successfully
+ */
+function validatePipelineTemplate(config) {
+    return validateTemplate(config, 'validator/pipelineTemplate');
+}
+
+/**
+ * Publishes the jobs and pipeline template yaml by posting to the endpoint
  * @method publishTemplate
  * @param  {Object}         config          Template config
- * @return {Promise}        Resolves if publish successfully
+ * @param  {String}         apiURL          endpoint API
+ * @return {Promise}        Resolves if publishes successfully
  */
-function publishTemplate(config) {
+function publishTemplate(config, apiURL) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'templates');
+    const url = URL.resolve(hostname, apiURL);
 
     return request({
         method: 'POST',
@@ -83,18 +103,40 @@ function publishTemplate(config) {
             throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
-        let fullTemplateName = body.name;
+        return body;
+    });
+}
+
+/**
+ * Publishes the job template yaml by using the publishTemplate method and passing the API endpoint
+ * @method publishJobTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if publishes successfully
+ */
+function publishJobTemplate(config) {
+    return publishTemplate(config, 'templates').then(template => {
+        let fullTemplateName = template.name;
 
         // Figure out template name
-        if (body.namespace && body.namespace !== 'default') {
-            fullTemplateName = `${body.namespace}/${body.name}`;
+        if (template.namespace && template.namespace !== 'default') {
+            fullTemplateName = `${template.namespace}/${template.name}`;
         }
 
         return {
             name: fullTemplateName,
-            version: body.version
+            version: template.version
         };
     });
+}
+
+/**
+ * Publishes the pipeline template yaml by using the publishTemplate method and passing the API endpoint
+ * @method publishPipelineTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if publishes successfully
+ */
+function publishPipelineTemplate(config) {
+    return publishTemplate(config, 'pipeline/template/publish');
 }
 
 /**
@@ -292,13 +334,16 @@ function removeTag({ name, tag }) {
         };
     });
 }
+
 module.exports = {
     loadYaml,
-    validateTemplate,
-    publishTemplate,
+    validateJobTemplate,
+    publishJobTemplate,
     removeTemplate,
     removeVersion,
     tagTemplate,
     removeTag,
-    getVersionFromTag
+    getVersionFromTag,
+    validatePipelineTemplate,
+    publishPipelineTemplate
 };
