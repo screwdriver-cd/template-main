@@ -17,7 +17,13 @@ function loadYaml(path) {
     });
 }
 
-// eslint-disable-next-line require-jsdoc
+/**
+ * Validates the jobs and pipeline template yaml by posting to the endpoint
+ * @method validateTemplate
+ * @param  {Object}         config          Template config
+ * @param  {String}         apiURL          endpoint API
+ * @return {Promise}        Resolves if validates successfully
+ */
 function validateTemplate(config, apiURL) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
     const url = URL.resolve(hostname, apiURL);
@@ -50,25 +56,36 @@ function validateTemplate(config, apiURL) {
     });
 }
 
-// eslint-disable-next-line require-jsdoc
+/**
+ * Validates the job template yaml by using the validateTemplate method and passing the API endpoint
+ * @method validateJobTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if validates successfully
+ */
 function validateJobTemplate(config) {
     return validateTemplate(config, 'validator/template');
 }
 
-// eslint-disable-next-line require-jsdoc
+/**
+ * Validates the pipeline template yaml by using the validateTemplate method and passing the API endpoint
+ * @method validatePipelineTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if validates successfully
+ */
 function validatePipelineTemplate(config) {
     return validateTemplate(config, 'validator/pipelineTemplate');
 }
 
 /**
- * Publishes the template yaml by posting to the SDAPI /templates endpoint
+ * Publishes the jobs and pipeline template yaml by posting to the endpoint
  * @method publishTemplate
  * @param  {Object}         config          Template config
- * @return {Promise}        Resolves if publish successfully
+ * @param  {String}         apiURL          endpoint API
+ * @return {Promise}        Resolves if publishes successfully
  */
-function publishTemplate(config) {
+function publishTemplate(config, apiURL) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, 'templates');
+    const url = URL.resolve(hostname, apiURL);
 
     return request({
         method: 'POST',
@@ -86,18 +103,31 @@ function publishTemplate(config) {
             throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
         }
 
-        let fullTemplateName = body.name;
-
-        // Figure out template name
-        if (body.namespace && body.namespace !== 'default') {
-            fullTemplateName = `${body.namespace}/${body.name}`;
-        }
-
         return {
-            name: fullTemplateName,
+            name: body.name,
             version: body.version
         };
     });
+}
+
+/**
+ * Publishes the job template yaml by using the publishTemplate method and passing the API endpoint
+ * @method publishJobTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if publishes successfully
+ */
+function publishJobTemplate(config) {
+    return publishTemplate(config, 'templates');
+}
+
+/**
+ * Publishes the pipeline template yaml by using the publishTemplate method and passing the API endpoint
+ * @method publishPipelineTemplate
+ * @param  {Object}         config          Template config
+ * @return {Promise}        Resolves if publishes successfully
+ */
+function publishPipelineTemplate(config) {
+    return publishTemplate(config, 'pipeline/template/publish');
 }
 
 /**
@@ -296,38 +326,10 @@ function removeTag({ name, tag }) {
     });
 }
 
-// eslint-disable-next-line require-jsdoc
-function publishPipelineTemplate(config) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const url = URL.resolve(hostname, '/pipeline/template/publish');
-
-    return request({
-        method: 'POST',
-        url,
-        context: {
-            token: process.env.SD_TOKEN
-        },
-        json: {
-            yaml: JSON.stringify(config)
-        }
-    }).then(response => {
-        const { body } = response;
-
-        if (response.statusCode !== 201) {
-            throw new Error(`Error publishing template. ${response.statusCode} (${body.error}): ${body.message}`);
-        }
-
-        return {
-            name: body.name,
-            version: body.version
-        };
-    });
-}
-
 module.exports = {
     loadYaml,
     validateJobTemplate,
-    publishTemplate,
+    publishJobTemplate,
     removeTemplate,
     removeVersion,
     tagTemplate,

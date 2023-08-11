@@ -5,7 +5,7 @@ const index = require('./index');
 const path = process.env.SD_TEMPLATE_PATH || './sd-template.yaml';
 
 const operations = {
-    /* Publish template */
+    /* Publish job template */
     publish: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' },
@@ -14,7 +14,7 @@ const operations = {
         exec(opts) {
             return index
                 .loadYaml(path)
-                .then(config => index.publishTemplate(config))
+                .then(config => index.publishJobTemplate(config))
                 .then(publishResult =>
                     index.tagTemplate({
                         name: publishResult.name,
@@ -40,7 +40,7 @@ const operations = {
         help: 'publish template'
     },
 
-    /* Validate template */
+    /* Validate job template */
     validate: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
@@ -203,6 +203,7 @@ const operations = {
         help: 'get version from tag'
     },
 
+    /* Validate pipeline template */
     validatePipelineTemplate: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
@@ -226,28 +227,18 @@ const operations = {
         help: 'validate pipeline template'
     },
 
+    /* Publish pipeline template */
     publishPipelineTemplate: {
         opts: {
-            json: { abbr: 'j', flag: true, help: 'Output result as json' },
-            tag: { abbr: 't', default: 'latest', help: 'Add template tag' }
+            json: { abbr: 'j', flag: true, help: 'Output result as json' }
         },
         exec(opts) {
             return index
                 .loadYaml(path)
                 .then(config => index.publishPipelineTemplate(config))
-                .then(publishResult =>
-                    index.tagTemplate({
-                        name: publishResult.name,
-                        tag: opts.tag,
-                        version: publishResult.version
-                    })
-                )
                 .then(result => {
                     if (!opts.json) {
-                        console.log(
-                            `Pipeline template ${result.name}@${result.version} was ` +
-                                `successfully published and tagged as ${result.tag}`
-                        );
+                        console.log(`Pipeline template ${result.name}@${result.version} was successfully published`);
                     } else {
                         console.log(JSON.stringify(result));
                     }
@@ -264,8 +255,8 @@ const operations = {
 /**
  * Execute the given command by name.
  * @method run
+ * @param  {String}    command name
  * @return {Object}    result of command, if any
- * @param name
  */
 function run(name) {
     const opts = nomnom.options(operations[name].opts).help(operations[name].help).parse();
