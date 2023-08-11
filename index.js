@@ -136,7 +136,7 @@ function publishJobTemplate(config) {
  * @return {Promise}        Resolves if publishes successfully
  */
 function publishPipelineTemplate(config) {
-    return publishTemplate(config, 'pipeline/template/publish');
+    return publishTemplate(config, 'pipelineTemplates');
 }
 
 /**
