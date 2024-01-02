@@ -2,4 +2,4 @@
 
 'use strict';
 
-require('../commands').run('publishPipelineTemplate');
+require('../commands').run('publish_pipeline_template');

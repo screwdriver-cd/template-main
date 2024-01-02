@@ -346,7 +346,7 @@ describe('index', () => {
                 requestMock.rejects(new Error('error'));
 
                 return index
-                    .tagTemplate(config)
+                    .tagJobTemplate(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(err.message, 'error');
@@ -366,7 +366,7 @@ describe('index', () => {
                 requestMock.resolves(responseFake);
 
                 return index
-                    .tagTemplate(config)
+                    .tagJobTemplate(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(err.message, 'Error tagging template. 403 (Forbidden): Fake forbidden message');
@@ -381,7 +381,7 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.tagTemplate(config).then(result => {
+                return index.tagJobTemplate(config).then(result => {
                     assert.deepEqual(result, {
                         name: config.name,
                         tag: config.tag,
@@ -408,7 +408,7 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.tagTemplate(config).then(result => {
+                return index.tagJobTemplate(config).then(result => {
                     assert.deepEqual(result, {
                         name: config.name,
                         version: config.version,
@@ -465,7 +465,7 @@ describe('index', () => {
                 requestMock.onFirstCall().resolves(versionsResponseFake);
                 requestMock.onSecondCall().resolves(resultResponseFake);
 
-                return index.tagTemplate(versionlessConfig).then(result => {
+                return index.tagJobTemplate(versionlessConfig).then(result => {
                     assert.deepEqual(result, {
                         name: config.name,
                         tag: config.tag,
@@ -500,7 +500,7 @@ describe('index', () => {
                 requestMock.resolves(versionsResponseFake);
 
                 return index
-                    .tagTemplate(versionlessConfig)
+                    .tagJobTemplate(versionlessConfig)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(
@@ -614,6 +614,200 @@ describe('index', () => {
                         }
                     });
                 });
+            });
+        });
+    });
+
+    describe('Pipeline Template Tag', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }pipeline/template/my_template/test/tags/stable`;
+
+        describe('Create/Update a tag', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test',
+                tag: 'stable',
+                version: '1.0.0'
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index
+                    .tagPipelineTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('throws error for the corresponding request error status code if not 201', () => {
+                const responseFake = {
+                    statusCode: 403,
+                    body: {
+                        statusCode: 403,
+                        error: 'Forbidden',
+                        message: 'Fake forbidden message'
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index
+                    .tagJobTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'Error tagging template. 403 (Forbidden): Fake forbidden message');
+                    });
+            });
+
+            it('succeeds and does not throw an error if request status code is 201', () => {
+                const responseFake = {
+                    statusCode: 201,
+                    body: templateConfig
+                };
+
+                console.log('responseFake', responseFake);
+
+                requestMock.resolves(responseFake);
+
+                return index.tagPipelineTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name,
+                        tag: config.tag,
+                        version: config.version
+                    });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        },
+                        json: {
+                            version: '1.0.0'
+                        }
+                    });
+                });
+            });
+
+            it('succeeds and does not throw an error if request status code is 200', () => {
+                const responseFake = {
+                    statusCode: 200,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.tagPipelineTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name,
+                        version: config.version,
+                        tag: config.tag
+                    });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        },
+                        json: {
+                            version: '1.0.0'
+                        }
+                    });
+                });
+            });
+
+            it('succeeds when no version number is provided', () => {
+                const versionlessConfig = {
+                    namespace: 'my_template',
+                    name: config.name,
+                    tag: config.tag
+                };
+                const versionsResponseFake = {
+                    statusCode: 200,
+                    body: [
+                        {
+                            id: 23,
+                            labels: [],
+                            config: {
+                                image: 'node:6',
+                                steps: [
+                                    {
+                                        echo: 'echo $FOO'
+                                    }
+                                ],
+                                environment: {
+                                    FOO: 'bar'
+                                }
+                            },
+                            name: 'tifftemplate',
+                            version: '1.0.0',
+                            description: 'test',
+                            maintainer: 'foo@bar.com',
+                            pipelineId: 113
+                        }
+                    ]
+                };
+                const resultResponseFake = {
+                    statusCode: 201,
+                    body: templateConfig
+                };
+
+                requestMock.onFirstCall().resolves(versionsResponseFake);
+                requestMock.onSecondCall().resolves(resultResponseFake);
+
+                return index.tagPipelineTemplate(versionlessConfig).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name,
+                        tag: config.tag,
+                        version: config.version
+                    });
+                    assert.calledWith(requestMock, {
+                        method: 'PUT',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        },
+                        json: {
+                            version: '1.0.0'
+                        }
+                    });
+                });
+            });
+
+            it("throws an error when getting latest template versions doesn't yield 200", () => {
+                const versionlessConfig = {
+                    namespace: config.namespace,
+                    name: config.name,
+                    tag: config.tag
+                };
+                const versionsResponseFake = {
+                    statusCode: 404,
+                    body: {
+                        error: 'Not Found',
+                        message: 'Some 404 message'
+                    }
+                };
+
+                requestMock.resolves(versionsResponseFake);
+
+                return index
+                    .tagPipelineTemplate(versionlessConfig)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(
+                            err.message,
+                            'Error getting latest template version. 404 (Not Found): Some 404 message'
+                        );
+                    });
             });
         });
     });

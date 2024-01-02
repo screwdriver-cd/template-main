@@ -16,7 +16,7 @@ const operations = {
                 .loadYaml(path)
                 .then(config => index.publishJobTemplate(config))
                 .then(publishResult =>
-                    index.tagTemplate({
+                    index.tagJobTemplate({
                         name: publishResult.name,
                         tag: opts.tag,
                         version: publishResult.version
@@ -74,7 +74,7 @@ const operations = {
         },
         exec(opts) {
             return index
-                .tagTemplate({
+                .tagJobTemplate({
                     name: opts.name,
                     tag: opts.tag,
                     version: opts.version
@@ -204,7 +204,7 @@ const operations = {
     },
 
     /* Validate pipeline template */
-    validatePipelineTemplate: {
+    validate_pipeline_template: {
         opts: {
             json: { abbr: 'j', flag: true, help: 'Output result as json' }
         },
@@ -228,17 +228,28 @@ const operations = {
     },
 
     /* Publish pipeline template */
-    publishPipelineTemplate: {
+    publish_pipeline_template: {
         opts: {
-            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+            json: { abbr: 'j', flag: true, help: 'Output result as json' },
+            tag: { abbr: 't', default: 'latest', help: 'Add template tag' }
         },
         exec(opts) {
             return index
                 .loadYaml(path)
                 .then(config => index.publishPipelineTemplate(config))
+                .then(publishResult =>
+                    index.tagPipelineTemplate({
+                        name: publishResult.name,
+                        namespace: publishResult.namespace,
+                        tag: opts.tag,
+                        version: publishResult.version
+                    })
+                )
                 .then(result => {
                     if (!opts.json) {
-                        console.log(`Pipeline template ${result.name}@${result.version} was successfully published`);
+                        console.log(
+                            `Pipeline template ${result.name}@${result.version} was successfully published and tagged as ${result.tag}`
+                        );
                     } else {
                         console.log(JSON.stringify(result));
                     }
