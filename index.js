@@ -73,7 +73,7 @@ function validateJobTemplate(config) {
  * @return {Promise}        Resolves if validates successfully
  */
 function validatePipelineTemplate(config) {
-    return validateTemplate(config, 'validator/pipelineTemplate');
+    return validateTemplate(config, 'pipeline/template/validate');
 }
 
 /**
@@ -259,7 +259,7 @@ function getVersionFromTag({ name, tag }) {
 }
 
 /**
- * Tags a specific template version by posting to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
+ * Tags a specific template version by posting to the SDAPI endpoint
  * @method tagTemplate
  * @param  {Object}    config
  * @param  {String}    config.name       Template name
@@ -267,14 +267,12 @@ function getVersionFromTag({ name, tag }) {
  * @param  {String}    [config.version]  Template version
  * @return {Promise}                     Resolves if tagged successfully
  */
-function tagTemplate({ name, tag, version }) {
+function tagTemplate({ path, name, tag, version }) {
     const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name);
-    const templateTag = encodeURIComponent(tag);
-    const url = URL.resolve(hostname, `templates/${templateName}/tags/${templateTag}`);
+    const url = URL.resolve(hostname, path);
 
     if (!version) {
-        return getLatestVersion(name).then(latest => tagTemplate({ name, tag, version: latest }));
+        return getLatestVersion(name).then(latest => tagTemplate({ path, name, tag, version: latest }));
     }
 
     return request({
@@ -297,6 +295,44 @@ function tagTemplate({ name, tag, version }) {
             name,
             tag,
             version
+        };
+    });
+}
+
+/**
+ * Tags a specific template version by posting to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
+ * @method tagJobTemplate
+ * @param  {Object}    config
+ * @param  {String}    config.name       Template name
+ * @param  {String}    config.tag        Template tag
+ * @param  {String}    [config.version]  Template version
+ * @return {Promise}                     Resolves if tagged successfully
+ */
+function tagJobTemplate({ name, tag, version }) {
+    const path = `templates/${encodeURIComponent(name)}/tags/${encodeURIComponent(tag)}`;
+
+    return tagTemplate({ path, name, tag, version });
+}
+
+/**
+ * Tags a specific template version by posting to the SDAPI /pipeline/templates/{name}/tags/{tag} endpoint
+ * @method tagPipelineTemplate
+ * @param  {Object}    config
+ * @param  {String}    config.namespace  Template namespace
+ * @param  {String}    config.name       Template name
+ * @param  {String}    config.tag        Template tag
+ * @param  {String}    [config.version]  Template version
+ * @return {Promise}                     Resolves if tagged successfully
+ */
+function tagPipelineTemplate({ namespace, name, tag, version }) {
+    const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/tags/${tag}`;
+
+    return tagTemplate({ path, name, tag, version }).then(res => {
+        return {
+            namespace,
+            name,
+            tag,
+            version: res.version
         };
     });
 }
@@ -341,9 +377,10 @@ module.exports = {
     publishJobTemplate,
     removeTemplate,
     removeVersion,
-    tagTemplate,
+    tagJobTemplate,
     removeTag,
     getVersionFromTag,
     validatePipelineTemplate,
-    publishPipelineTemplate
+    publishPipelineTemplate,
+    tagPipelineTemplate
 };

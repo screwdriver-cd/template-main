@@ -2,4 +2,4 @@
 
 'use strict';
 
-require('../commands').run('validatePipelineTemplate');
+require('../commands').run('validate_pipeline_template');
