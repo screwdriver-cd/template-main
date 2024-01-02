@@ -230,7 +230,8 @@ const operations = {
     /* Publish pipeline template */
     publish_pipeline_template: {
         opts: {
-            json: { abbr: 'j', flag: true, help: 'Output result as json' }
+            json: { abbr: 'j', flag: true, help: 'Output result as json' },
+            tag: { abbr: 't', default: 'latest', help: 'Add template tag' }
         },
         exec(opts) {
             return index

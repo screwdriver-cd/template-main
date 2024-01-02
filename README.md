@@ -219,6 +219,62 @@ jobs:
         steps:
             - get_version: ./node_modules/.bin/template-get-version-from-tag --name templateName --tag latest
 ```
+## Pipeline Templates
+
+### Validating a template
+
+Run the `pipeline-template-validate` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
+
+Example `screwdriver.yaml`:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/pipeline-template-validate
+        environment:
+            SD_TEMPLATE_PATH: ./path/to/pipeline-template.yaml
+```
+
+`pipeline-template-validate` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/pipeline-template-validate --json
+{"valid":true}
+```
+
+### Publishing a pipeline template
+
+Run the `pipeline-template-publish` script. By default, the path `./sd-template.yaml` will be read. However, a user can specify a custom path using the env variable: `SD_TEMPLATE_PATH`.
+
+Example `screwdriver.yaml` with validation and publishing:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/pipeline-template-publish --tag stable
+```
+
+`pipeline-template-publish` can print a result as json by passing `--json` option to the command. `pipeline-template-publish` will tag the published version as well. The default tag is `latest` if none is specified.
+
+```
+$ ./node_modules/.bin/pipeline-template-publish --json
+{namespace:"template", name:"foo",version:"1.2.3",tag:"stable"}
+```
 
 ## Testing
 
