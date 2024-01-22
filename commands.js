@@ -106,7 +106,7 @@ const operations = {
 
         exec(opts) {
             return index
-                .removeTag({
+                .removeJobTemplateTag({
                     name: opts.name,
                     tag: opts.tag
                 })
@@ -135,7 +135,7 @@ const operations = {
 
         exec(opts) {
             return index
-                .removeVersion({
+                .removeJobTemplateVersion({
                     name: opts.name,
                     version: opts.version
                 })
@@ -163,7 +163,7 @@ const operations = {
 
         exec(opts) {
             return index
-                .removeTemplate(opts.name)
+                .removeJobTemplate(opts.name)
                 .then(result => {
                     if (!opts.json) {
                         console.log(`Template ${result.name} was successfully removed`);
@@ -188,7 +188,7 @@ const operations = {
 
         exec(opts) {
             return index
-                .getVersionFromTag({
+                .getVersionFromJobTemplateTag({
                     name: opts.name,
                     tag: opts.tag
                 })
@@ -260,6 +260,140 @@ const operations = {
                 });
         },
         help: 'publish pipeline template'
+    },
+    /* Add tag for pipeline template */
+    tag_pipeline_template: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            namespace: {
+                required: true,
+                abbr: 's',
+                help: 'Template namespace'
+            },
+            tag: { abbr: 't', required: true, help: 'Tag name' },
+            version: { abbr: 'v', required: false, help: 'Tag version' }
+        },
+        exec(opts) {
+            return index
+                .tagPipelineTemplate({
+                    name: opts.name,
+                    namespace: opts.namespace,
+                    tag: opts.tag,
+                    version: opts.version
+                })
+                .then(result => {
+                    console.log(JSON.stringify(result));
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        }
+    },
+    get_version_from_pipeline_template_tag: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            namespace: {
+                required: true,
+                abbr: 's',
+                help: 'Template namespace'
+            },
+            tag: { abbr: 't', required: true, help: 'Tag name' }
+        },
+        exec(opts) {
+            return index
+                .getVersionFromPipelineTemplateTag({
+                    name: opts.name,
+                    namespace: opts.namespace,
+                    tag: opts.tag
+                })
+                .then(result => {
+                    console.log(`${result}`);
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        }
+    },
+    /* Remove tag for pipeline template */
+    remove_pipeline_template: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            namespace: {
+                required: true,
+                abbr: 's',
+                help: 'Template namespace'
+            },
+            tag: { abbr: 't', required: true, help: 'Tag name' }
+        },
+        exec(opts) {
+            return index
+                .removePipelineTemplate({
+                    name: opts.name,
+                    namespace: opts.namespace,
+                    tag: opts.tag
+                })
+                .then(result => {
+                    console.log(JSON.stringify(result));
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        }
+    },
+    remove_pipeline_template_tag: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            namespace: {
+                required: true,
+                abbr: 's',
+                help: 'Template namespace'
+            },
+            tag: { abbr: 't', required: true, help: 'Tag name' }
+        },
+        exec(opts) {
+            return index
+                .removePipelineTemplateTag({
+                    name: opts.name,
+                    namespace: opts.namespace,
+                    tag: opts.tag
+                })
+                .then(result => {
+                    console.log(JSON.stringify(result));
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        }
+    },
+    remove_pipeline_template_version: {
+        opts: {
+            name: { required: true, abbr: 'n', help: 'Template name' },
+            namespace: {
+                required: true,
+                abbr: 's',
+                help: 'Template namespace'
+            },
+            version: { abbr: 'v', required: true, help: 'Version' }
+        },
+        exec(opts) {
+            return index
+                .removePipelineTemplateVersion({
+                    name: opts.name,
+                    namespace: opts.namespace,
+                    version: opts.version
+                })
+                .then(result => {
+                    console.log(JSON.stringify(result));
+                })
+                .catch(err => {
+                    console.error(err);
+                    process.exit(1);
+                });
+        }
     }
 };
 
