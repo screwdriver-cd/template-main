@@ -17,7 +17,12 @@
     "template-remove-version": "./bin/removeVersion.js",
     "template-get-version-from-tag": "./bin/getVersionFromTag.js",
     "pipeline-template-validate": "./bin/pipelineTemplateValidate.js",
-    "pipeline-template-publish": "./bin/pipelineTemplatePublish.js"
+    "pipeline-template-publish": "./bin/pipelineTemplatePublish.js",
+    "pipeline-template-remove": "./bin/pipelineTemplateRemove.js",
+    "pipeline-template-tag": "./bin/pipelineTemplateTag.js",
+    "pipeline-template-remove-tag": "./bin/pipelineTemplateRemoveTag.js",
+    "pipeline-template-remove-version": "./bin/pipelineTemplateRemoveVersion.js",
+    "pipeline-template-get-version-from-tag": "./bin/pipelineTemplateGetVersionTag.js"
   },
   "repository": {
     "type": "git",

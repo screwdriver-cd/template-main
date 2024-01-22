@@ -5,6 +5,8 @@ const URL = require('url');
 const request = require('screwdriver-request');
 const Yaml = require('js-yaml');
 
+const SD_API_URL = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+
 /**
  * Loads the yaml configuration from a file
  * @method loadYaml
@@ -25,7 +27,7 @@ function loadYaml(path) {
  * @return {Promise}        Resolves if validates successfully
  */
 function validateTemplate(config, apiURL) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const hostname = SD_API_URL;
     const url = URL.resolve(hostname, apiURL);
 
     return request({
@@ -84,7 +86,7 @@ function validatePipelineTemplate(config) {
  * @return {Promise}        Resolves if publishes successfully
  */
 function publishTemplate(config, apiURL) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const hostname = SD_API_URL;
     const url = URL.resolve(hostname, apiURL);
 
     return request({
@@ -140,15 +142,16 @@ function publishPipelineTemplate(config) {
 }
 
 /**
- * Removes all versions of a template by sending a delete request to the SDAPI /templates/{name} endpoint
- * @method removeTemplate
- * @param  {String}        name         The full template name
- * @return {Promise}       Resolves if removed successfully
+ * Removes a template.
+ * @param {Object} config - The config for removing the template.
+ * @param {string} config.path - The path of the template.
+ * @param {string} config.name - The name of the template.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the name of the removed template.
+ * @throws {Error} If there is an error removing the template.
  */
-function removeTemplate(name) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name);
-    const url = URL.resolve(hostname, `templates/${templateName}`);
+function removeTemplate({ path, name }) {
+    const hostname = SD_API_URL;
+    const url = URL.resolve(hostname, path);
 
     return request({
         method: 'DELETE',
@@ -168,18 +171,17 @@ function removeTemplate(name) {
 }
 
 /**
- * Removes specified version of a template by sending a delete request to the SDAPI /templates/{name}/versions/{version} endpoint
- * @method removeTemplate
+ * Removes specified version of a template by sending a delete request to the SDAPI endpoint
+ * @method removeVersion
  * @param  {Object}    config
+ * @param  {string}     config.path - The path of the template.
  * @param  {String}    config.name    Template name
  * @param  {String}    config.version Template version to be removed
  * @return {Promise}                  Resolves if removed successfully
  */
-function removeVersion({ name, version }) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name);
-    const templateVersion = encodeURIComponent(version);
-    const url = URL.resolve(hostname, `templates/${templateName}/versions/${templateVersion}`);
+function removeVersion({ path, name, version }) {
+    const hostname = SD_API_URL;
+    const url = URL.resolve(hostname, path);
 
     return request({
         method: 'DELETE',
@@ -207,7 +209,7 @@ function removeVersion({ name, version }) {
  * @return {Promise}        Resolves to latest version
  */
 function getLatestVersion(name) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const hostname = SD_API_URL;
     const templateName = encodeURIComponent(name);
     const url = URL.resolve(hostname, `templates/${templateName}`);
 
@@ -231,15 +233,14 @@ function getLatestVersion(name) {
 /**
  * Helper function that returns the version from a tag
  * @method getVersionFromTag
+ * @param  {String}         path        The API path
  * @param  {String}         name        Template name
  * @param  {String}         tag         Tag to fetch version from
  * @return {Promise}        Resolves the version from given tag
  */
-function getVersionFromTag({ name, tag }) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name);
-    const templateTag = encodeURIComponent(tag);
-    const url = URL.resolve(hostname, `templates/${templateName}/${templateTag}`);
+function getVersionFromTag({ path, name, tag }) {
+    const hostname = SD_API_URL;
+    const url = URL.resolve(hostname, path);
 
     return request({
         method: 'GET',
@@ -251,7 +252,9 @@ function getVersionFromTag({ name, tag }) {
         const { body, statusCode } = response;
 
         if (statusCode !== 200) {
-            throw new Error(`Error getting version from tag. ${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(
+                `Error getting version from ${name} tag ${tag}. ${statusCode} (${body.error}): ${body.message}`
+            );
         }
 
         return body.version;
@@ -268,7 +271,7 @@ function getVersionFromTag({ name, tag }) {
  * @return {Promise}                     Resolves if tagged successfully
  */
 function tagTemplate({ path, name, tag, version }) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
+    const hostname = SD_API_URL;
     const url = URL.resolve(hostname, path);
 
     if (!version) {
@@ -324,32 +327,31 @@ function tagJobTemplate({ name, tag, version }) {
  * @param  {String}    [config.version]  Template version
  * @return {Promise}                     Resolves if tagged successfully
  */
-function tagPipelineTemplate({ namespace, name, tag, version }) {
+async function tagPipelineTemplate({ namespace, name, tag, version }) {
     const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/tags/${tag}`;
 
-    return tagTemplate({ path, name, tag, version }).then(res => {
-        return {
-            namespace,
-            name,
-            tag,
-            version: res.version
-        };
-    });
+    const res = await tagTemplate({ path, name, tag, version });
+
+    return {
+        namespace,
+        name,
+        tag,
+        version: res.version
+    };
 }
 
 /**
- * Removes a template tag by sending a delete request to the SDAPI /templates/{templateName}/tags/{tagName} endpoint
- * @method removeTag
- * @param  {Object}    config
- * @param  {String}    config.name    Template name
- * @param  {String}    config.tag     Template tag
- * @return {Promise}                  Resolves if tagged successfully
+ * Removes a tag from a template.
+ * @param {Object} config - The config for removing the tag.
+ * @param {string} config.path - The path of the template.
+ * @param {string} config.name - The name of the template.
+ * @param {string} config.tag - The tag to be removed.
+ * @returns {Promise<void>} - A promise that resolves when the tag is successfully removed.
+ * @throws {Error} - If there is an error removing the tag.
  */
-function removeTag({ name, tag }) {
-    const hostname = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
-    const templateName = encodeURIComponent(name);
-    const templateTag = encodeURIComponent(tag);
-    const url = URL.resolve(hostname, `templates/${templateName}/tags/${templateTag}`);
+function removeTag({ path, name, tag }) {
+    const hostname = SD_API_URL;
+    const url = URL.resolve(hostname, path);
 
     return request({
         method: 'DELETE',
@@ -361,26 +363,168 @@ function removeTag({ name, tag }) {
         const { body, statusCode } = response;
 
         if (statusCode !== 204) {
-            throw new Error(`Error removing template tag. ${statusCode} (${body.error}): ${body.message}`);
+            throw new Error(
+                `Error removing template ${name} tag ${tag}. ${statusCode} (${body.error}): ${body.message}`
+            );
         }
-
-        return {
-            name,
-            tag
-        };
     });
+}
+
+/**
+ * Removes a job template.
+ * @param {Object} config - The config for removing the job template.
+ * @param {string} config.name - The name of the job template to be removed.
+ * @returns {Object} - The removed job template's name.
+ */
+async function removeJobTemplate(name) {
+    const path = `templates/${encodeURIComponent(name)}`;
+
+    await removeTemplate({ path, name });
+
+    return {
+        name
+    };
+}
+
+/**
+ * Removes a pipeline template.
+ * @param {Object} config - The config for removing the pipeline template.
+ * @param {string} config.namespace - The namespace of the pipeline template.
+ * @param {string} config.name - The name of the pipeline template.
+ * @returns {Object} - The removed pipeline template's namespace and name.
+ */
+async function removePipelineTemplate({ namespace, name }) {
+    const path = `pipeline/templates/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}`;
+
+    await removeTemplate({ path, name: `${namespace}/${name}` });
+
+    return {
+        namespace,
+        name
+    };
+}
+
+/**
+ * Removes a job template version.
+ * @param {Object} params - The parameters for removing the job template version.
+ * @param {string} params.name - The name of the job template.
+ * @param {string} params.version - The version of the job template.
+ * @returns {Object} - The removed job template version.
+ */
+async function removeJobTemplateVersion({ name, version }) {
+    const path = `templates/${encodeURIComponent(name)}/versions/${version}`;
+
+    await removeVersion({ path, name, version });
+
+    return {
+        name,
+        version
+    };
+}
+
+/**
+ * Removes a specific version of a pipeline template.
+ * @param {Object} config - The config for removing the pipeline template version.
+ * @param {string} config.namespace - The namespace of the pipeline template.
+ * @param {string} config.name - The name of the pipeline template.
+ * @param {string} config.version - The version of the pipeline template to remove.
+ * @returns {Object} - The removed pipeline template version details.
+ */
+async function removePipelineTemplateVersion({ namespace, name, version }) {
+    const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/versions/${version}`;
+
+    await removeVersion({ path, name: `${namespace}/${name}`, version });
+
+    return {
+        namespace,
+        name,
+        version
+    };
+}
+
+/**
+ * Removes a tag from a job template.
+ * @param {Object} config - The config for removing the tag.
+ * @param {string} config.name - The name of the job template.
+ * @param {string} config.tag - The tag to be removed.
+ * @returns {Object} - The name and tag of the removed tag.
+ */
+async function removeJobTemplateTag({ name, tag }) {
+    const path = `templates/${encodeURIComponent(name)}/tags/${tag}`;
+
+    await removeTag({ path, name, tag });
+
+    return {
+        name,
+        tag
+    };
+}
+
+/**
+ * Removes a pipeline template tag.
+ * @param {Object} config - The config for removing the tag.
+ * @param {string} config.namespace - The namespace of the pipeline template.
+ * @param {string} config.name - The name of the pipeline template.
+ * @param {string} config.tag - The tag to be removed.
+ * @returns {Object} - The removed pipeline template tag information.
+ */
+async function removePipelineTemplateTag({ namespace, name, tag }) {
+    const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/tags/${tag}`;
+
+    await removeTag({ path, name: `${namespace}/${name}`, tag });
+
+    return {
+        namespace,
+        name,
+        tag
+    };
+}
+
+/**
+ * Retrieves the version of a job template based on its name and tag.
+ * @param {Object} config - The config for retrieving the version.
+ * @param {string} config.name - The name of the job template.
+ * @param {string} config.tag - The tag of the job template.
+ * @returns {Promise<Object>} A promise that resolves to an object containing the name, tag, and version of the job template.
+ */
+async function getVersionFromJobTemplateTag({ name, tag }) {
+    const path = `templates/${encodeURIComponent(name)}/${tag}`;
+
+    const version = await getVersionFromTag({ path, name, tag });
+
+    return version;
+}
+
+/**
+ * Retrieves the version of a pipeline template based on the provided namespace, name, and tag.
+ * @param {Object} config - The config for retrieving the version.
+ * @param {string} config.namespace - The namespace of the pipeline template.
+ * @param {string} config.name - The name of the pipeline template.
+ * @param {string} config.tag - The tag of the pipeline template.
+ * @returns {Promise<Object>} - A promise that resolves to an object containing the namespace, name, tag, and version of the pipeline template.
+ */
+async function getVersionFromPipelineTemplateTag({ namespace, name, tag }) {
+    const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/${tag}`;
+
+    const version = await getVersionFromTag({ path, name: `${namespace}/${name}`, tag });
+
+    return version;
 }
 
 module.exports = {
     loadYaml,
     validateJobTemplate,
     publishJobTemplate,
-    removeTemplate,
-    removeVersion,
+    removeJobTemplate,
+    removeJobTemplateVersion,
     tagJobTemplate,
-    removeTag,
-    getVersionFromTag,
+    removeJobTemplateTag,
+    getVersionFromJobTemplateTag,
     validatePipelineTemplate,
     publishPipelineTemplate,
-    tagPipelineTemplate
+    tagPipelineTemplate,
+    removePipelineTemplate,
+    removePipelineTemplateVersion,
+    removePipelineTemplateTag,
+    getVersionFromPipelineTemplateTag
 };

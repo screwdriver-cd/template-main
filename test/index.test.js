@@ -26,7 +26,7 @@ describe('index', () => {
             load: sinon.stub()
         };
         fsMock = {
-            readFileSync: sinon.stub()
+            readFileSync: sinon.stub().returns()
         };
         templateConfig = {
             name: 'template/test',
@@ -220,7 +220,7 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index
-                .removeTemplate(templateConfig.name)
+                .removeJobTemplate(templateConfig.name)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(err.message, 'error');
@@ -240,7 +240,7 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index
-                .removeTemplate(templateConfig.name)
+                .removeJobTemplate(templateConfig.name)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     // eslint-disable-next-line max-len
@@ -257,8 +257,10 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
+            console.log('......', templateConfig.name);
+
             return index
-                .removeTemplate(templateConfig.name)
+                .removeJobTemplate(templateConfig.name)
                 .then(result => assert.deepEqual(result, { name: templateConfig.name }));
         });
     });
@@ -277,7 +279,7 @@ describe('index', () => {
             requestMock.rejects(new Error('error'));
 
             return index
-                .removeVersion(config)
+                .removeJobTemplateVersion(config)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(err.message, 'error');
@@ -297,7 +299,7 @@ describe('index', () => {
             requestMock.resolves(responseFake);
 
             return index
-                .removeVersion(config)
+                .removeJobTemplateVersion(config)
                 .then(() => assert.fail('should not get here'))
                 .catch(err => {
                     assert.equal(
@@ -314,7 +316,7 @@ describe('index', () => {
 
             requestMock.resolves(responseFake);
 
-            return index.removeVersion(config).then(result => {
+            return index.removeJobTemplateVersion(config).then(result => {
                 assert.deepEqual(result, {
                     name: config.name,
                     version: config.version
@@ -521,7 +523,7 @@ describe('index', () => {
                 requestMock.rejects(new Error('error'));
 
                 return index
-                    .getVersionFromTag(config)
+                    .getVersionFromJobTemplateTag(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(err.message, 'error');
@@ -540,7 +542,7 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.getVersionFromTag(config).then(result => {
+                return index.getVersionFromJobTemplateTag(config).then(result => {
                     assert.deepEqual(result, templateConfig.version);
                     assert.calledWith(requestMock, {
                         method: 'GET',
@@ -563,7 +565,7 @@ describe('index', () => {
                 requestMock.rejects(new Error('error'));
 
                 return index
-                    .removeTag(config)
+                    .removeJobTemplateTag(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(err.message, 'error');
@@ -583,12 +585,12 @@ describe('index', () => {
                 requestMock.resolves(responseFake);
 
                 return index
-                    .removeTag(config)
+                    .removeJobTemplateTag(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(
                             err.message,
-                            'Error removing template tag. 403 (Forbidden): Fake forbidden message'
+                            'Error removing template template/test tag stable. 403 (Forbidden): Fake forbidden message'
                         );
                     });
             });
@@ -601,7 +603,7 @@ describe('index', () => {
 
                 requestMock.resolves(responseFake);
 
-                return index.removeTag(config).then(result => {
+                return index.removeJobTemplateTag(config).then(result => {
                     assert.deepEqual(result, {
                         name: config.name,
                         tag: config.tag
@@ -659,7 +661,7 @@ describe('index', () => {
                 requestMock.resolves(responseFake);
 
                 return index
-                    .tagJobTemplate(config)
+                    .tagPipelineTemplate(config)
                     .then(() => assert.fail('should not get here'))
                     .catch(err => {
                         assert.equal(err.message, 'Error tagging template. 403 (Forbidden): Fake forbidden message');
@@ -808,6 +810,283 @@ describe('index', () => {
                             'Error getting latest template version. 404 (Not Found): Some 404 message'
                         );
                     });
+            });
+        });
+    });
+
+    describe('Remove a pipeline template', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        const url = `${process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'}pipeline/templates/my_template/test`;
+
+        describe('Remove a template', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test'
+            };
+
+            it('throws error when request yields an error with code 204', () => {
+                const responseFake = {
+                    statusCode: 403,
+                    body: {
+                        statusCode: 403,
+                        error: 'Forbidden',
+                        message: 'Fake forbidden message'
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index
+                    .removePipelineTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        // eslint-disable-next-line max-len
+                        const msg = 'Error removing template my_template/test. 403 (Forbidden): Fake forbidden message';
+
+                        assert.equal(err.message, msg);
+                    });
+            });
+
+            it('successfully removes a template', () => {
+                const responseFake = {
+                    statusCode: 204,
+                    body: {
+                        errors: [],
+                        template: templateConfig
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.removePipelineTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name
+                    });
+
+                    assert.calledWith(requestMock, {
+                        method: 'DELETE',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        }
+                    });
+                });
+            });
+        });
+    });
+
+    describe('Pipeline Template Remove Tag', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }pipeline/template/my_template/test/tags/stable`;
+
+        describe('Remove a tag', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test',
+                tag: 'stable'
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index
+                    .removePipelineTemplateTag(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('successfully removes a template tag', () => {
+                const responseFake = {
+                    statusCode: 204,
+                    body: {
+                        errors: [],
+                        template: templateConfig
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.removePipelineTemplateTag(config).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name,
+                        tag: config.tag
+                    });
+
+                    assert.calledWith(requestMock, {
+                        method: 'DELETE',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        }
+                    });
+                });
+            });
+        });
+    });
+
+    describe('Pipeline Template Validate', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        describe('Validate a template', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test',
+                version: '1.0.0',
+                description: 'test description',
+                maintainer: '',
+                config: {
+                    image: 'node:6',
+                    steps: [{ publish: 'node ./test.js' }]
+                }
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index
+                    .validatePipelineTemplate(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('successfully validates a template', () => {
+                const responseFake = {
+                    body: {
+                        errors: [],
+                        template: templateConfig
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.validatePipelineTemplate(config).then(result => {
+                    assert.deepEqual(result, {
+                        valid: true
+                    });
+                });
+            });
+        });
+    });
+
+    describe('Pipeline Template Remove Version', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }pipeline/template/my_template/test/versions/1.0.0`;
+
+        describe('Remove a version', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test',
+                version: '1.0.0'
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index
+                    .removePipelineTemplateVersion(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('successfully removes a template version', () => {
+                const responseFake = {
+                    statusCode: 204,
+                    body: {
+                        errors: [],
+                        template: templateConfig
+                    }
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.removePipelineTemplateVersion(config).then(result => {
+                    assert.deepEqual(result, {
+                        namespace: config.namespace,
+                        name: config.name,
+                        version: config.version
+                    });
+
+                    assert.calledWith(requestMock, {
+                        method: 'DELETE',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        }
+                    });
+                });
+            });
+        });
+    });
+
+    describe('get version from a pipeline template tag', () => {
+        beforeEach(() => {
+            templateConfig.namespace = 'my_template';
+        });
+
+        const url = `${
+            process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/'
+        }pipeline/template/my_template/test/stable`;
+
+        describe('get version from a tag', () => {
+            const config = {
+                namespace: 'my_template',
+                name: 'test',
+                tag: 'stable'
+            };
+
+            it('throws error when request yields an error', () => {
+                requestMock.rejects(new Error('error'));
+
+                return index
+                    .getVersionFromPipelineTemplateTag(config)
+                    .then(() => assert.fail('should not get here'))
+                    .catch(err => {
+                        assert.equal(err.message, 'error');
+                    });
+            });
+
+            it('gets a version from a tag', () => {
+                const responseFake = {
+                    statusCode: 200,
+                    body: templateConfig
+                };
+
+                requestMock.resolves(responseFake);
+
+                return index.getVersionFromPipelineTemplateTag(config).then(result => {
+                    assert.deepEqual(result, templateConfig.version);
+
+                    assert.calledWith(requestMock, {
+                        method: 'GET',
+                        url,
+                        context: {
+                            token: process.env.SD_TOKEN
+                        }
+                    });
+                });
             });
         });
     });
