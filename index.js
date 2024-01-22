@@ -141,7 +141,6 @@ function publishPipelineTemplate(config) {
     return publishTemplate(config, 'pipelineTemplates');
 }
 
-
 /**
  * Removes a template.
  * @param {Object} config - The config for removing the template.
