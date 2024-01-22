@@ -128,7 +128,7 @@ jobs:
             - remove: ./node_modules/.bin/template-remove-version --name templateName --version 1.0.0
 ```
 
-`template-remove-tag` can print a result as json by passing `--json` option to the command.
+`template-remove-version` can print a result as json by passing `--json` option to the command.
 
 ### Tagging a template
 
@@ -219,6 +219,7 @@ jobs:
         steps:
             - get_version: ./node_modules/.bin/template-get-version-from-tag --name templateName --tag latest
 ```
+
 ## Pipeline Templates
 
 ### Validating a template
@@ -274,6 +275,159 @@ jobs:
 ```
 $ ./node_modules/.bin/pipeline-template-publish --json
 {namespace:"template", name:"foo",version:"1.2.3",tag:"stable"}
+```
+
+### Removing a template
+
+To remove a template, run the `pipeline-template-remove` script. You'll need to add an argument for the template namespace, name. Removing a template will remove _all_ of its versions and tags.
+
+Example `screwdriver.yaml` with validation and publishing, and template removal as a detached job:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/pipeline-template-publish
+    remove_template:
+        steps:
+            - install: npm install screwdriver-template-main
+            - remove: ./node_modules/.bin/pipeline-template-remove --namespace templateNamespace --name templateName
+```
+
+`pipeline-template-remove` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/pipeline-template-remove --json --namespace templateNamespace --name templateName 
+{"namespace":"templateNamespace", "name":"templateName"}
+```
+
+### Removing a pipeline template version
+
+To remove a specific version of a template, run the `pipeline-template-remove-version` binary. This must be done in the same pipeline that published the template. You'll need to specify the template namespace, name and version as arguments.
+Removing a template version will remove all the tags associated with it.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and version removal as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/pipeline-template-publish
+            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
+    detached_remove_version:
+        steps:
+            - remove: ./node_modules/.bin/pipeline-template-remove-version --namespace templateNamespace --name templateName --version 1.0.0
+```
+
+`pipeline-template-remove-version` can print a result as json by passing `--json` option to the command.
+
+
+### Tagging a template
+
+Optionally, tag a template using the `pipeline-template-tag` script. This must be done in the same pipeline that published the template. You'll need to add arguments for the template namespace, name and tag. You can optionally specify a version; the version must be an exact version, not just a major or major.minor one. If omitted, the latest version will be tagged.
+
+Example `screwdriver.yaml` with validation and publishing and tagging:
+
+```yaml
+shared:
+    image: node:6
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - install: npm install screwdriver-template-main
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - install: npm install screwdriver-template-main
+            - publish: ./node_modules/.bin/pipeline-template-publish
+            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.2.3 --tag stable
+```
+
+`pipeline-template-tag` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/template-tag --json --name templateName --version 1.2.3 --tag stable
+{"namespace":"templateNamespace", "name":"templateName","tag":"stable","version":"1.2.3"}
+```
+
+### Removing a template tag
+
+
+To remove a template tag, run the `pipeline-template-remove-tag` binary. This must be done in the same pipeline that published the template. You'll need to specify the template name and tag as arguments.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and tag removal as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/pipeline-template-publish
+            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
+    detached_remove_tag:
+        steps:
+            - remove: ./node_modules/.bin/pipeline-template-remove-tag --namespace templateNamespace --name templateName --tag latest
+```
+
+`pipeline-template-remove-tag` can print a result as json by passing `--json` option to the command.
+
+```
+$ ./node_modules/.bin/pipeline-template-remove-tag --json --namespace templateNamespace --name templateName --tag stable
+{"namespace":"templateNamespace", "name":"templateName","tag":"stable"}
+```
+
+### Getting the version from a template tag
+
+To get the version from a template tag, run the `pipeline-template-get-version-from-tag` binary. This must be done in the same pipeline that published the template. You'll need to add arguments for the template name and tag.
+
+Example `screwdriver.yaml` with validation, publishing and tagging, and getting a version as a detached job:
+
+```yaml
+shared:
+    image: node:6
+    steps:
+        - init: npm install screwdriver-template-main
+jobs:
+    main:
+        requires: [~pr, ~commit]
+        steps:
+            - validate: ./node_modules/.bin/pipeline-template-validate
+    publish:
+        requires: main
+        steps:
+            - publish: ./node_modules/.bin/pipeline-template-publish
+            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
+    detached_get_version_from_tag:
+        steps:
+            - get_version: ./node_modules/.bin/pipeline-template-get-version-from-tag --namespace templateNamespace --name templateName --tag latest
 ```
 
 ## Testing
