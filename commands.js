@@ -316,7 +316,7 @@ const operations = {
                 });
         }
     },
-    /* Remove tag for pipeline template */
+    /* Remove pipeline template */
     remove_pipeline_template: {
         opts: {
             name: { required: true, abbr: 'n', help: 'Template name' },
@@ -324,15 +324,13 @@ const operations = {
                 required: true,
                 abbr: 's',
                 help: 'Template namespace'
-            },
-            tag: { abbr: 't', required: true, help: 'Tag name' }
+            }
         },
         exec(opts) {
             return index
                 .removePipelineTemplate({
                     name: opts.name,
-                    namespace: opts.namespace,
-                    tag: opts.tag
+                    namespace: opts.namespace
                 })
                 .then(result => {
                     console.log(JSON.stringify(result));
