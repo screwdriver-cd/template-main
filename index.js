@@ -377,7 +377,6 @@ function removeTag({ path, name, tag }) {
  * @returns {Object} - The removed job template's name.
  */
 async function removeJobTemplate(name) {
-
     const path = `templates/${encodeURIComponent(name)}`;
 
     await removeTemplate({ path, name });
