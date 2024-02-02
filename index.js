@@ -138,7 +138,7 @@ function publishJobTemplate(config) {
  * @return {Promise}        Resolves if publishes successfully
  */
 async function publishPipelineTemplate(config) {
-    const template = await publishTemplate(config, '/pipeline/template');
+    const template = await publishTemplate(config, 'pipeline/template');
 
     return {
         namespace: template.namespace,
