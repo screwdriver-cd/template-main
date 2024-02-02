@@ -620,6 +620,94 @@ describe('index', () => {
         });
     });
 
+    describe('Pipeline Template Publish', () => {
+        const pipelineTemplateConfig = {
+            namespace: 'template',
+            name: 'test',
+            version: '1.0.0',
+            description: 'test description',
+            maintainer: 'sd',
+            config: {
+                shared: {
+                    image: 'node:6'
+                },
+                jobs: [
+                    {
+                        main: {
+                            steps: [{ publish: 'node ./test.js' }]
+                        }
+                    }
+                ]
+            }
+        };
+
+        it('throws error when request yields an error', () => {
+            requestMock.rejects(new Error('error'));
+
+            return index
+                .publishPipelineTemplate(pipelineTemplateConfig)
+                .then(() => assert.fail('should not get here'))
+                .catch(err => {
+                    assert.equal(err.message, 'error');
+                });
+        });
+
+        it('throws error for the corresponding request error status code if not 201', () => {
+            const responseFake = {
+                statusCode: 403,
+                body: {
+                    statusCode: 403,
+                    error: 'Forbidden',
+                    message: 'Fake forbidden message'
+                }
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index
+                .publishPipelineTemplate(pipelineTemplateConfig)
+                .then(() => assert.fail('should not get here'))
+                .catch(err => {
+                    assert.equal(err.message, 'Error publishing template. 403 (Forbidden): Fake forbidden message');
+                });
+        });
+
+        it('succeeds and does not throw an error if request status code is 201', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: pipelineTemplateConfig
+            };
+
+            requestMock.resolves(responseFake);
+
+            return index.publishPipelineTemplate(pipelineTemplateConfig).then(result =>
+                assert.deepEqual(result, {
+                    namespace: pipelineTemplateConfig.namespace,
+                    name: pipelineTemplateConfig.name,
+                    version: pipelineTemplateConfig.version
+                })
+            );
+        });
+
+        it('succeeds and does not throw an error given a name and namespace', () => {
+            const responseFake = {
+                statusCode: 201,
+                body: pipelineTemplateConfig
+            };
+
+            pipelineTemplateConfig.namespace = 'meow';
+            requestMock.resolves(responseFake);
+
+            return index.publishPipelineTemplate(templateConfig).then(result =>
+                assert.deepEqual(result, {
+                    namespace: pipelineTemplateConfig.namespace,
+                    name: pipelineTemplateConfig.name,
+                    version: pipelineTemplateConfig.version
+                })
+            );
+        });
+    });
+
     describe('Pipeline Template Tag', () => {
         beforeEach(() => {
             templateConfig.namespace = 'my_template';
