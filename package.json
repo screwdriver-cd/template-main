@@ -22,7 +22,7 @@
     "pipeline-template-tag": "./bin/pipelineTemplateTag.js",
     "pipeline-template-remove-tag": "./bin/pipelineTemplateRemoveTag.js",
     "pipeline-template-remove-version": "./bin/pipelineTemplateRemoveVersion.js",
-    "pipeline-template-get-version-from-tag": "./bin/pipelineTemplateGetVersionTag.js"
+    "pipeline-template-get-version-from-tag": "./bin/pipelineTemplateGetVersionFromTag.js"
   },
   "repository": {
     "type": "git",
