@@ -215,7 +215,7 @@ function removeVersion({ path, name, version }) {
  * @return {Promise}        Resolves to latest version
  */
 function getLatestVersion(path) {
-    const url = URL.resolve(hostname, path);
+    const url = URL.resolve(SD_API_URL, path);
 
     return request({
         method: 'GET',
@@ -236,7 +236,7 @@ function getLatestVersion(path) {
 
 /**
  * Helper function that returns the latest version for a job template
- * @param {String} name 
+ * @param {String} name
  * @return {Promise}        Resolves to latest version
  */
 function getJobTemplateLatestVersion(name) {
@@ -251,7 +251,7 @@ function getJobTemplateLatestVersion(name) {
  * @param  {String}         namespace   Template namespace
  * @param  {String}         name        Template name
  * @return {Promise}        Resolves to latest version
-*/
+ */
 function getPipelineTemplateLatestVersion(namespace, name) {
     const path = `pipeline/templates/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/versions?count=1`;
 
@@ -339,6 +339,7 @@ async function tagJobTemplate({ name, tag, version }) {
     const path = `templates/${encodeURIComponent(name)}/tags/${encodeURIComponent(tag)}`;
 
     let tagVersion = version;
+
     if (!version) {
         tagVersion = await getJobTemplateLatestVersion(name);
     }
@@ -360,10 +361,10 @@ async function tagPipelineTemplate({ namespace, name, tag, version }) {
     const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/tags/${tag}`;
 
     let tagVersion = version;
+
     if (!version) {
         tagVersion = await getPipelineTemplateLatestVersion(name);
     }
-
 
     const res = await tagTemplate({ path, name, tag, version: tagVersion });
 
