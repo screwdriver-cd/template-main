@@ -214,10 +214,8 @@ function removeVersion({ path, name, version }) {
  * @param  {String}         name        Template name
  * @return {Promise}        Resolves to latest version
  */
-function getLatestVersion(name) {
-    const hostname = SD_API_URL;
-    const templateName = encodeURIComponent(name);
-    const url = URL.resolve(hostname, `templates/${templateName}`);
+function getLatestVersion(path) {
+    const url = URL.resolve(SD_API_URL, path);
 
     return request({
         method: 'GET',
@@ -234,6 +232,30 @@ function getLatestVersion(name) {
 
         return body[0].version;
     });
+}
+
+/**
+ * Helper function that returns the latest version for a job template
+ * @param {String} name
+ * @return {Promise}        Resolves to latest version
+ */
+function getJobTemplateLatestVersion(name) {
+    const path = `templates/${encodeURIComponent(name)}`;
+
+    return getLatestVersion(path);
+}
+
+/**
+ * Helper function that returns the latest version for a pipeline template
+ * @method getPipelineTemplateLatestVersion
+ * @param  {String}         namespace   Template namespace
+ * @param  {String}         name        Template name
+ * @return {Promise}        Resolves to latest version
+ */
+function getPipelineTemplateLatestVersion(namespace, name) {
+    const path = `pipeline/templates/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/versions?count=1`;
+
+    return getLatestVersion(path);
 }
 
 /**
@@ -280,10 +302,6 @@ function tagTemplate({ path, name, tag, version }) {
     const hostname = SD_API_URL;
     const url = URL.resolve(hostname, path);
 
-    if (!version) {
-        return getLatestVersion(name).then(latest => tagTemplate({ path, name, tag, version: latest }));
-    }
-
     return request({
         method: 'PUT',
         url,
@@ -317,10 +335,16 @@ function tagTemplate({ path, name, tag, version }) {
  * @param  {String}    [config.version]  Template version
  * @return {Promise}                     Resolves if tagged successfully
  */
-function tagJobTemplate({ name, tag, version }) {
+async function tagJobTemplate({ name, tag, version }) {
     const path = `templates/${encodeURIComponent(name)}/tags/${encodeURIComponent(tag)}`;
 
-    return tagTemplate({ path, name, tag, version });
+    let tagVersion = version;
+
+    if (!version) {
+        tagVersion = await getJobTemplateLatestVersion(name);
+    }
+
+    return tagTemplate({ path, name, tag, version: tagVersion });
 }
 
 /**
@@ -336,7 +360,13 @@ function tagJobTemplate({ name, tag, version }) {
 async function tagPipelineTemplate({ namespace, name, tag, version }) {
     const path = `pipeline/template/${encodeURIComponent(namespace)}/${encodeURIComponent(name)}/tags/${tag}`;
 
-    const res = await tagTemplate({ path, name, tag, version });
+    let tagVersion = version;
+
+    if (!version) {
+        tagVersion = await getPipelineTemplateLatestVersion(name);
+    }
+
+    const res = await tagTemplate({ path, name, tag, version: tagVersion });
 
     return {
         namespace,
