@@ -21,7 +21,7 @@ Example `screwdriver.yaml`:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
@@ -47,7 +47,7 @@ Example `screwdriver.yaml` with validation and publishing:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
@@ -76,7 +76,7 @@ Example `screwdriver.yaml` with validation and publishing, and template removal 
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
@@ -110,7 +110,7 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and version 
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
     steps:
         - init: npm install screwdriver-template-main
 jobs:
@@ -138,7 +138,7 @@ Example `screwdriver.yaml` with validation and publishing and tagging:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
@@ -169,7 +169,7 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and tag remo
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
     steps:
         - init: npm install screwdriver-template-main
 jobs:
@@ -202,7 +202,7 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and getting 
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
     steps:
         - init: npm install screwdriver-template-main
 jobs:
@@ -230,13 +230,12 @@ Example `screwdriver.yaml`:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - install: npm install screwdriver-template-main
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
         environment:
             SD_TEMPLATE_PATH: ./path/to/pipeline-template.yaml
 ```
@@ -247,6 +246,12 @@ jobs:
 $ ./node_modules/.bin/pipeline-template-validate --json
 {"valid":true}
 ```
+Usage with npx
+```
+$ npx -y -p screwdriver-template-main pipeline-template-validate
+{"valid":true}
+```
+
 
 ### Publishing a pipeline template
 
@@ -256,24 +261,27 @@ Example `screwdriver.yaml` with validation and publishing:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - install: npm install screwdriver-template-main
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
     publish:
         requires: main
         steps:
-            - install: npm install screwdriver-template-main
-            - publish: ./node_modules/.bin/pipeline-template-publish --tag stable
+            - publish: npx -y -p screwdriver-template-main pipeline-template-publish --tag stable
 ```
 
 `pipeline-template-publish` can print a result as json by passing `--json` option to the command. `pipeline-template-publish` will tag the published version as well. The default tag is `latest` if none is specified.
 
 ```
 $ ./node_modules/.bin/pipeline-template-publish --json
+{namespace:"template", name:"foo",version:"1.2.3",tag:"stable"}
+```
+Usage with npx
+```
+$ npx -y -p screwdriver-template-main pipeline-template-publish --json
 {namespace:"template", name:"foo",version:"1.2.3",tag:"stable"}
 ```
 
@@ -285,22 +293,19 @@ Example `screwdriver.yaml` with validation and publishing, and template removal 
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - install: npm install screwdriver-template-main
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
     publish:
         requires: main
         steps:
-            - install: npm install screwdriver-template-main
-            - publish: ./node_modules/.bin/pipeline-template-publish
+            - publish: npx -y -p screwdriver-template-main pipeline-template-publish
     remove_template:
         steps:
-            - install: npm install screwdriver-template-main
-            - remove: ./node_modules/.bin/pipeline-template-remove --namespace templateNamespace --name templateName
+            - remove: npx -y -p screwdriver-template-main pipeline-template-remove --namespace templateNamespace --name templateName
 ```
 
 `pipeline-template-remove` can print a result as json by passing `--json` option to the command.
@@ -309,6 +314,12 @@ jobs:
 $ ./node_modules/.bin/pipeline-template-remove --json --namespace templateNamespace --name templateName 
 {"namespace":"templateNamespace", "name":"templateName"}
 ```
+Usage with npx
+```
+$ npx -y -p screwdriver-template-main pipeline-template-remove --json --namespace templateNamespace --name templateName 
+{"namespace":"templateNamespace", "name":"templateName"}
+```
+
 
 ### Removing a pipeline template version
 
@@ -319,22 +330,20 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and version 
 
 ```yaml
 shared:
-    image: node:6
-    steps:
-        - init: npm install screwdriver-template-main
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
     publish:
         requires: main
         steps:
-            - publish: ./node_modules/.bin/pipeline-template-publish
-            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
+            - publish: npx -y -p screwdriver-template-main pipeline-template-publish
+            - tag: npx -y -p screwdriver-template-main pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
     detached_remove_version:
         steps:
-            - remove: ./node_modules/.bin/pipeline-template-remove-version --namespace templateNamespace --name templateName --version 1.0.0
+            - remove: npx -y -p screwdriver-template-main pipeline-template-remove-version --namespace templateNamespace --name templateName --version 1.0.0
 ```
 
 `pipeline-template-remove-version` can print a result as json by passing `--json` option to the command.
@@ -348,25 +357,23 @@ Example `screwdriver.yaml` with validation and publishing and tagging:
 
 ```yaml
 shared:
-    image: node:6
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - install: npm install screwdriver-template-main
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
     publish:
         requires: main
         steps:
-            - install: npm install screwdriver-template-main
-            - publish: ./node_modules/.bin/pipeline-template-publish
-            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.2.3 --tag stable
+            - publish: npx -y -p screwdriver-template-main pipeline-template-publish
+            - tag: npx -y -p screwdriver-template-main pipeline-template-tag --namespace templateNamespace --name templateName --version 1.2.3 --tag stable
 ```
 
 `pipeline-template-tag` can print a result as json by passing `--json` option to the command.
 
 ```
-$ ./node_modules/.bin/template-tag --json --name templateName --version 1.2.3 --tag stable
+$ npx -y -p screwdriver-template-main pipeline-template-tag --json --name templateName --version 1.2.3 --tag stable
 {"namespace":"templateNamespace", "name":"templateName","tag":"stable","version":"1.2.3"}
 ```
 
@@ -379,9 +386,7 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and tag remo
 
 ```yaml
 shared:
-    image: node:6
-    steps:
-        - init: npm install screwdriver-template-main
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
@@ -400,7 +405,7 @@ jobs:
 `pipeline-template-remove-tag` can print a result as json by passing `--json` option to the command.
 
 ```
-$ ./node_modules/.bin/pipeline-template-remove-tag --json --namespace templateNamespace --name templateName --tag stable
+$ npx -y -p screwdriver-template-main pipeline-template-remove-tag --json --namespace templateNamespace --name templateName --tag stable
 {"namespace":"templateNamespace", "name":"templateName","tag":"stable"}
 ```
 
@@ -412,22 +417,20 @@ Example `screwdriver.yaml` with validation, publishing and tagging, and getting 
 
 ```yaml
 shared:
-    image: node:6
-    steps:
-        - init: npm install screwdriver-template-main
+    image: node:18
 jobs:
     main:
         requires: [~pr, ~commit]
         steps:
-            - validate: ./node_modules/.bin/pipeline-template-validate
+            - validate: npx -y -p screwdriver-template-main pipeline-template-validate
     publish:
         requires: main
         steps:
-            - publish: ./node_modules/.bin/pipeline-template-publish
-            - tag: ./node_modules/.bin/pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
+            - publish: npx -y -p screwdriver-template-main pipeline-template-publish
+            - tag: npx -y -p screwdriver-template-main pipeline-template-tag --namespace templateNamespace --name templateName --version 1.0.0 --tag latest
     detached_get_version_from_tag:
         steps:
-            - get_version: ./node_modules/.bin/pipeline-template-get-version-from-tag --namespace templateNamespace --name templateName --tag latest
+            - get_version: npx -y -p screwdriver-template-main pipeline-template-get-version-from-tag --namespace templateNamespace --name templateName --tag latest
 ```
 
 ## Testing
