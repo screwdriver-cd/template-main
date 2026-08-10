@@ -23,7 +23,15 @@ describe('index', () => {
     beforeEach(() => {
         requestMock = sinon.stub();
         YamlMock = {
-            load: sinon.stub()
+            CORE_SCHEMA: {
+                withTags: sinon.stub().returns('yaml-schema')
+            },
+            binaryTag: {},
+            load: sinon.stub(),
+            mergeTag: {},
+            omapTag: {},
+            pairsTag: {},
+            timestampTag: {}
         };
         fsMock = {
             readFileSync: sinon.stub().returns()
@@ -61,9 +69,21 @@ describe('index', () => {
 
     describe('Load Yaml', () => {
         it('resolves if loads successfully', () => {
-            YamlMock.load.resolves('yamlcontent');
+            fsMock.readFileSync.returns('yamlcontent');
+            YamlMock.load.returns('yamlcontent');
 
-            return index.loadYaml(config => assert.equal(config, 'yamlcontent'));
+            return index.loadYaml('template.yaml').then(config => {
+                assert.equal(config, 'yamlcontent');
+                assert.calledWith(YamlMock.load, 'yamlcontent', { schema: 'yaml-schema' });
+            });
+        });
+
+        it('rejects if yaml loading fails', () => {
+            YamlMock.load.throws(new Error('expected a document'));
+
+            return index.loadYaml('template.yaml').then(assert.fail, err => {
+                assert.equal(err.message, 'expected a document');
+            });
         });
     });
 

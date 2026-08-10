@@ -4,6 +4,13 @@ const fs = require('fs');
 const URL = require('url');
 const request = require('screwdriver-request');
 const Yaml = require('js-yaml');
+const YAML_SCHEMA = Yaml.CORE_SCHEMA.withTags(
+    Yaml.binaryTag,
+    Yaml.mergeTag,
+    Yaml.omapTag,
+    Yaml.pairsTag,
+    Yaml.timestampTag
+);
 
 const SD_API_URL = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
 
@@ -15,7 +22,7 @@ const SD_API_URL = process.env.SD_API_URL || 'https://api.screwdriver.cd/v4/';
  */
 function loadYaml(path) {
     return new Promise(resolve => {
-        resolve(Yaml.load(fs.readFileSync(path, 'utf8')));
+        resolve(Yaml.load(fs.readFileSync(path, 'utf8'), { schema: YAML_SCHEMA }));
     });
 }
 
